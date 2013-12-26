@@ -1,0 +1,53 @@
+    #contextMenu {
+      background: #e1efc7;
+      border: 1px solid gray;
+      padding: 2px;
+      display: inline-block;
+      min-width: 100px;
+      -moz-box-shadow: 2px 2px 2px silver;
+      -webkit-box-shadow: 2px 2px 2px silver;
+      z-index: 99999;
+    }
+
+    #contextMenu li {
+      padding: 4px 4px 4px 14px;
+      list-style: none;
+      cursor: pointer;
+      background: url("../images/arrow_right_peppermint.png") no-repeat center left;
+    }
+
+    #contextMenu li:hover {
+      background-color: white;
+    }
+    .invalid input[type="text"]{
+      border: 1px solid #cd0a0a;
+      background: #fef1ec url(images/ui-bg_glass_95_fef1ec_1x400.png) 50% 50% repeat-x;
+      color: #cd0a0a; }
+
+    .slick-column-name { white-space: normal; }
+
+    div.slick-header-column.ui-state-default {
+        height: 45px;
+    }
+
+    .contact-box {
+      z-index:15;
+      position:absolute;
+      background:white;
+      padding:5px;
+      border:3px solid gray;
+      -moz-border-radius:10px;
+      border-radius:10px;
+    }
+
+    .editor-complete {
+      background:white;
+      width:250px;
+      height:30px;
+      border:1;
+      outline:0';
+
+    }
+    #editor-autocomplete {
+      width:300px;
+    }

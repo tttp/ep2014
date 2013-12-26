@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/candidates</path>
+    <page_callback>CRM_Ep2014_Page_Grid</page_callback>
+    <title>Candidates</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

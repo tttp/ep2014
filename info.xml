@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<extension key="org.ep2014.editor" type="module">
+  <file>editor</file>
+  <name>EP2014 editor</name>
+  <description>Batch update/add candidates</description>
+  <license>aGPL3</license>
+  <maintainer>
+    <author>xavier</author>
+    <email>civicrm@tttp.eu</email>
+  </maintainer>
+  <releaseDate>2013-12-19</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.2</ver>
+  </compatibility>
+  <civix>
+    <namespace>CRM/Editor</namespace>
+  </civix>
+</extension>
