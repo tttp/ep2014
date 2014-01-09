@@ -1,6 +1,5 @@
 <?php
 
-
 require_once 'editor.civix.php';
 
 /**

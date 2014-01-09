@@ -11,11 +11,13 @@ class CRM_Ep2014_Page_Grid extends CRM_Core_Page {
     ->addScriptFile('org.ep2014.editor', 'packages/SlickGrid/slick.editors.js', 110, 'html-header', FALSE)
     ->addScriptFile('org.ep2014.editor', 'packages/SlickGrid/plugins/slick.rowselectionmodel.js', 110, 'html-header', FALSE)
     ->addScriptFile('org.ep2014.editor', 'packages/SlickGrid/slick.dataview.js', 110, 'html-header', FALSE)
+    ->addScriptFile('org.ep2014.editor', 'packages/SlickGrid/slick.groupitemmetadataprovider.js', 110, 'html-header', FALSE)
     ->addScriptFile('org.ep2014.editor', 'packages/SlickGrid/controls/slick.pager.js', 110, 'html-header', FALSE)
     ->addScriptFile('org.ep2014.editor', 'packages/SlickGrid/controls/slick.columnpicker.js', 110, 'html-header', FALSE)
     ->addScriptFile('org.ep2014.editor', 'packages/SlickGrid/plugins/slick.autotooltips.js', 110, 'html-header', FALSE)
     ->addScriptFile('org.ep2014.editor', 'js/grid.js', 110, 'html-header', FALSE)
     ->addScriptFile('civicrm', 'js/jquery/jquery.crmeditable.js', 110, 'html-header', FALSE)
+    ->addStyleFile('org.ep2014.editor', 'packages/SlickGrid/slick-default-theme.css', 12)
     ->addStyleFile('org.ep2014.editor', 'packages/SlickGrid/slick.grid.css', 12)
     ->addStyleFile('org.ep2014.editor', 'packages/SlickGrid/controls/slick.pager.css', 12)
 

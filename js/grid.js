@@ -1,6 +1,8 @@
+  var columnFilters = {};
+  
 cj(function ($) {
   var grid;
-//First Name  Last Name National party  European Group  Place on the list email Constituency  Country Telefon Twitter Facebook  Website City of residence
+
 
   function countryFormatter(row, cell, value, columnDef, dataContext) {
      return "<span class='country_"+dataContext.country_id+"'>"+value+"</span>";
@@ -17,9 +19,34 @@ cj(function ($) {
     }
     return true;
   }
-var columnFilters = {};
 
-  
+
+  function groupByCountry() {
+  dataView.setGrouping({
+    getter: "country",
+    formatter: function (g) {
+      return "Country:  " + g.value + "  <span style='color:green'>(" + g.count + " candidates)</span>";
+    },
+    aggregateCollapsed: false
+  });
+}
+
+  var options = {
+    enableCellNavigation: true,
+  enableAddRow: true,
+  editable: true,
+ asyncEditorLoading: true,
+  forceFitColumns: false,
+  topPanelHeight: 25,
+    enableColumnReorder: true
+  };
+
+ var groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider();
+//    var data = candidates.values;
+  dataView = new Slick.Data.DataView({ inlineFilters: true,groupItemMetadataProvider:groupItemMetadataProvider });
+  dataView.setItems(candidates.values);
+ 
+//First Name  Last Name National party  European Group  Place on the list email Constituency  Country Telefon Twitter Facebook  Website City of residence
   var columns = [
     {id: "first_name", name: "First Name", field: "first_name", editor: Slick.Editors.Text,sortable:true},
     {id: "last_name", name: "Last name", field: "last_name",minWidth:175, editor: Slick.Editors.Text,sortable:true },
@@ -35,25 +62,13 @@ var columnFilters = {};
     {id: "city", name:"City of residence", field: "city", editor: Slick.Editors.Text}
   ];
 
-  var options = {
-    enableCellNavigation: true,
-  enableAddRow: true,
-  editable: true,
- asyncEditorLoading: true,
-  forceFitColumns: false,
-  topPanelHeight: 25,
-    enableColumnReorder: true
-  };
-
-//    var data = candidates.values;
-  dataView = new Slick.Data.DataView({ inlineFilters: false });
-  dataView.setItems(candidates.values);
- 
  grid = new Slick.Grid("#candidates", dataView, columns, options);
 //   grid = new Slick.Grid("#candidates", candidates.values, columns, options);
   var pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
   var columnpicker = new Slick.Controls.ColumnPicker(columns, grid, options);
     grid.registerPlugin( new Slick.AutoTooltips({ enableForHeaderCells: true }) );
+   grid.registerPlugin(groupItemMetadataProvider);
+ 
 
  // move the filter panel defined in a hidden div into grid top panel
   $("#inlineFilterPanel")
@@ -129,7 +144,8 @@ console.log (args);
 */
 
 //  dataView.setFilter(myFilter);
-
+ groupByCountry();
+ 
   dataView.endUpdate();
 
 });

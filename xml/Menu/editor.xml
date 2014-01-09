@@ -6,4 +6,16 @@
     <title>Candidates</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/party</path>
+    <page_callback>CRM_Editor_Page_Party</page_callback>
+    <title>Party</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/candidate</path>
+    <page_callback>CRM_Editor_Page_Candidate</page_callback>
+    <title>Candidate</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
