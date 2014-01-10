@@ -2,7 +2,9 @@
 
 <script>
 
-var countries = {crmAPI sequential=0 entity="Constant" name="country"}.values;
+var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
+var countries = {crmAPI entity="Country"}.values;
+
 {if isset($country)}
 var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,nick_name,legal_name,country" option_sort="organization_name DESC" country=$country};
 {else}
@@ -11,6 +13,8 @@ var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=100
 {literal}
 cj(function($) {
     var oTable = $('#example').dataTable( {
+    bJQueryUI: true,
+
         "bPaginate":false,
         "aaData": parties.values,
         "aoColumns": [
@@ -80,7 +84,7 @@ console.log (oTable.fnGetPosition( this ));
     },settings);
 
     settings.type="select";
-    settings.data=countries;
+    settings.data=countries_flat;
     settings.onblur = 'submit';
  
     oTable.$('td.country').editable( function(value,settings) {
@@ -101,9 +105,69 @@ console.log (oTable.fnGetPosition( this ));
         }
       });
     },settings);
+
+    $(".ui-widget-header").append("<button id='add' class='add_row'>Add</button>");
+    var o= "";
+    $.each(countries, function (i,d) {
+      o = o + "<option value='"+d.id+"'>"+d.name+"</option>";
+    });
+    $("#new_dialog select#country").append (o);
+    $("#new_dialog").dialog({"modal":true,XavautoOpen:false}).submit (function (e) {
+      e.preventDefault();
+      var fields = ["organization_name", "legal_name", "nick_name", "country"];
+      var params = {
+        "dedupe_check":true,
+        "source": "civicrm/party",
+        "contact_type":"Organization",
+        "contact_sub_type":"party"
+      };
+      $.each(fields, function(id) {
+        params[fields[id]]=$("#"+fields[id]).val();
+      });
+      params["country"]=countries_flat[params["country"]];
+      var entity="contact";
+      CRM.api(entity, "create", params, {
+        context: this,
+        error: function (data) {
+console.log (data);
+        },
+        success: function (data) {
+          params["id"]=data["id"];
+          oTable.fnAddData( params);
+          $("#new_dialog").dialog('close');
+        }
+      });
+    });
+      
+    $("#add").click(function () { $("#new_dialog").dialog('open'); });
+
+
+
 });
 
 {/literal}
 </script>
 
 <table id="example"></table>
+
+<div id="new_dialog">
+<form>
+<div>
+<label>Name</label>
+<input id="organization_name" />
+</div>
+<div>
+<label>English Name</label>
+<input id="legal_name" />
+</div>
+<div>
+<label>Accronym</label>
+<input id="nick_name" />
+<label>Country</label>
+<select id="country">
+</select>
+</div>
+
+<input type="submit" name="save" />
+</form>
+</div>
