@@ -5,26 +5,44 @@
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country"}.values;
 
+var groups = {crmAPI entity="Contact" contact_sub_type="epgroup" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
+
 {if isset($country)}
-var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,nick_name,legal_name,country" option_sort="organization_name DESC" country=$country};
+var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,nick_name,legal_name,country" option_sort="organization_name ASC" country=$country};
 {else}
-var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,nick_name,legal_name,country" option_sort="organization_name DESC"};
+var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,nick_name,legal_name,country,custom_7" option_sort="organization_name ASC"};
 {/if}
 {literal}
+var groups_flat = {};
+
 cj(function($) {
+    $.each(groups, function(n) {
+        groups_flat[groups[n].id]=groups[n].organization_name;
+    });
+
+    $.each(parties.values, function(n) {
+      if (parties.values[n].custom_7) {
+        parties.values[n].custom_7=groups_flat[parties.values[n].custom_7];
+      };
+    });
+
     var oTable = $('#example').dataTable( {
     bJQueryUI: true,
-
-        "bPaginate":false,
-        "aaData": parties.values,
-        "aoColumns": [
- //           { "sTitle": "id",mData:"id"},
-            { "sTitle": "name", mDataProp: "organization_name",sClass: "editable"},
-            { "sTitle": "english", mDataProp:"legal_name","sClass": "editable" },
-            { "sTitle": "accronym" , mDataProp:"nick_name","sClass": "editable"},
-            { "sTitle": "country", mDataProp:"country", "sClass": "country" }
-        ]
-    } )
+    "bStateSave": true,
+    "bPaginate":false,
+    "aaData": parties.values,
+    "aoColumns": [
+//           { "sTitle": "id",mData:"id"},
+        { "sTitle": "name", mDataProp: "organization_name",sClass: "editable"},
+        { "sTitle": "group", mDataProp:"custom_7","sClass": "group" },
+        { "sTitle": "english", mDataProp:"legal_name","sClass": "editable" },
+        { "sTitle": "accronym" , mDataProp:"nick_name","sClass": "editable"},
+        { "sTitle": "country", mDataProp:"country", "sClass": "country" }
+    ],
+    "fnDrawCallback": function () {
+//TODO: add the editable
+    }
+  });
 
    var editableSettings = { 
      callBack:function(data){
@@ -34,7 +52,7 @@ cj(function($) {
              return editableSettings.success.call (this,data);
           }
         },
-        error: function(entity,field,value) {
+        error: function(data) {
           $(this).crmError(data.error_message, ts('Error'));
           $(this).removeClass('crm-editable-saving');
         },
@@ -75,7 +93,7 @@ console.log (oTable.fnGetPosition( this ));
       CRM.api(entity, "setvalue", {"field":field,"value":value, "id":contact_id}, {
         context: this,
         error: function (data) {
-          editableSettings.error.call(this,entity,field,value);
+          editableSettings.error.call(this,data);
         },
         success: function (data) {
           editableSettings.success.call(this,entity,field,value);
@@ -83,10 +101,32 @@ console.log (oTable.fnGetPosition( this ));
       });
     },settings);
 
+    /* Apply the jEditable handlers to the eu groups */
     settings.type="select";
-    settings.data=countries_flat;
+    settings.data=groups_flat;
     settings.onblur = 'submit';
  
+    oTable.$('td.group').editable( function(value,settings) {
+      $(this).addClass ('crm-editable-saving');
+      pos = oTable.fnGetPosition( this );
+      row= pos[0];
+      column= pos[2];
+      contact_id=parties.values[row].id;
+      entity="Contact";
+      CRM.api(entity, "create", {"custom_7":value, "id":contact_id}, {
+        context: this,
+        error: function (data) {
+          editableSettings.error.call(this,data);
+        },
+        success: function (data) {
+          value = countries[value];
+          editableSettings.success.call(this,entity,"contact",value);
+        }
+      });
+    },settings);
+
+    /* Apply the jEditable handlers to the countries */
+    settings.data=countries_flat;
     oTable.$('td.country').editable( function(value,settings) {
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
@@ -94,16 +134,32 @@ console.log (oTable.fnGetPosition( this ));
       column= pos[2];
       address_id=parties.values[row].address_id;
       entity="Address";
-      CRM.api(entity, "setvalue", {"field":"country_id","value":value, "id":address_id}, {
-        context: this,
-        error: function (data) {
-          editableSettings.error.call(this,entity,"country",value);
-        },
-        success: function (data) {
-          value = countries[value];
-          editableSettings.success.call(this,entity,"country",value);
-        }
-      });
+      if (address_id) {
+        CRM.api(entity, "setvalue", {"field":"country_id","value":value, "id":address_id}, {
+          context: this,
+          error: function (data) {
+            editableSettings.error.call(this,data);
+          },
+          success: function (data) {
+            value = countries_flat[value];
+            editableSettings.success.call(this,entity,"country",value);
+          }
+        });
+      } else {
+        contact_id=parties.values[row].id;
+        CRM.api(entity, "create", 
+          {"location_type_id":2,"is_primary":1,"country_id":value, "contact_id":contact_id}, {
+          context: this,
+          error: function (data) {
+            editableSettings.error.call(this,data);
+          },
+          success: function (data) {
+            value = countries_flat[value];
+            parties.values[row].address_id = data.address_id;
+            editableSettings.success.call(this,entity,"country",value);
+          }
+        });
+      }
     },settings);
 
     $(".ui-widget-header").append("<button id='add' class='add_row'>Add</button>");
@@ -112,9 +168,15 @@ console.log (oTable.fnGetPosition( this ));
       o = o + "<option value='"+d.id+"'>"+d.name+"</option>";
     });
     $("#new_dialog select#country").append (o);
-    $("#new_dialog").dialog({"modal":true,XavautoOpen:false}).submit (function (e) {
+    
+    var o= "";
+    $.each(groups, function (i,d) {
+      o = o + "<option value='"+d.id+"'>"+d.organization_name+"</option>";
+    });
+    $("#new_dialog select#custom_7").append (o);
+    $("#new_dialog").dialog({"modal":true, autoOpen:false}).submit (function (e) {
       e.preventDefault();
-      var fields = ["organization_name", "legal_name", "nick_name", "country"];
+      var fields = ["organization_name", "legal_name", "nick_name", "country","custom_7"];
       var params = {
         "dedupe_check":true,
         "source": "civicrm/party",
@@ -133,6 +195,7 @@ console.log (data);
         },
         success: function (data) {
           params["id"]=data["id"];
+          params["custom_7"]=groups_flat[params["custom_7"]];
           oTable.fnAddData( params);
           $("#new_dialog").dialog('close');
         }
@@ -152,22 +215,27 @@ console.log (data);
 
 <div id="new_dialog">
 <form>
-<div>
+<div class="form-item">
 <label>Name</label>
-<input id="organization_name" />
+<input id="organization_name"  class="form-control "/>
 </div>
-<div>
+<div class="form-item">
+<label>Group</label>
+<select id="custom_7"  class="form-control ">
+</select>
+</div>
+<div class="form-item">
 <label>English Name</label>
-<input id="legal_name" />
+<input id="legal_name" class="form-control "/>
 </div>
-<div>
+<div class="form-item">
 <label>Accronym</label>
-<input id="nick_name" />
+<input id="nick_name"  class="form-control "/>
 <label>Country</label>
-<select id="country">
+<select id="country"  class="form-control ">
 </select>
 </div>
 
-<input type="submit" name="save" />
+<input type="submit" name="save" class="btn-primary form-submit"/>
 </form>
 </div>
