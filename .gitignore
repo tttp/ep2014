@@ -1,0 +1,11 @@
+js/datatable/Readme.txt
+js/datatable/component.json
+js/datatable/docs/
+js/datatable/examples/
+js/datatable/extras/
+js/datatable/license-bsd.txt
+js/datatable/license-gpl2.txt
+js/datatable/package.json
+js/datatable/scripts/
+packages/
+*.swp
