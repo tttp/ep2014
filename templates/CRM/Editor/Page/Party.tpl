@@ -7,18 +7,15 @@ var countries = {crmAPI entity="Country"}.values;
 
 var groups = {crmAPI entity="Contact" contact_sub_type="epgroup" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
 
-{if isset($country)}
-var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,nick_name,legal_name,country" option_sort="organization_name ASC" country=$country};
-{else}
 var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,nick_name,legal_name,country,custom_7" option_sort="organization_name ASC"};
-{/if}
 {literal}
-var groups_flat = {};
+var groups_flat = {}; 
 
 cj(function($) {
     $.each(groups, function(n) {
         groups_flat[groups[n].id]=groups[n].organization_name;
     });
+    groups_flat[0]="-select-";
 
     $.each(parties.values, function(n) {
       if (parties.values[n].custom_7) {
@@ -26,7 +23,7 @@ cj(function($) {
       };
     });
 
-    var oTable = $('#example').dataTable( {
+    var oTable = $('#contacts').dataTable( {
     bJQueryUI: true,
     "bStateSave": true,
     "bPaginate":false,
@@ -58,7 +55,7 @@ cj(function($) {
         },
         success: function(entity,field,value) {
           var $i = $(this);
-          CRM.alert('', ts('Saved'), 'success');
+          CRM.alert(value, ts('Saved'), 'success');
           $i.removeClass ('crm-editable-saving crm-error');
           $i.html(value);
         }
@@ -78,8 +75,8 @@ console.log (oTable.fnGetPosition( this ));
   
         "height": "24px",
         "width": "100%",
-        "placeholder": '<span class="crm-editable-placeholder">Click to edit</span>'
-  
+        "placeholder": '<span class="crm-editable-placeholder">Click to edit</span>',
+        "onblur": "ignore" 
     };
 
     oTable.$('td.editable').editable( function(value,settings) {
@@ -96,9 +93,10 @@ console.log (oTable.fnGetPosition( this ));
           editableSettings.error.call(this,data);
         },
         success: function (data) {
-          editableSettings.success.call(this,entity,field,value);
+          CRM.alert( ts('Saved') + " " + value,parties.values[row].organization_name, 'success');
         }
       });
+      return value;
     },settings);
 
     /* Apply the jEditable handlers to the eu groups */
@@ -119,10 +117,10 @@ console.log (oTable.fnGetPosition( this ));
           editableSettings.error.call(this,data);
         },
         success: function (data) {
-          value = countries[value];
-          editableSettings.success.call(this,entity,"contact",value);
+          CRM.alert( parties.values[row].organization_name , ts('Saved') + " " + groups_flat[value], 'success');
         }
       });
+      return groups_flat[value];
     },settings);
 
     /* Apply the jEditable handlers to the countries */
@@ -141,8 +139,7 @@ console.log (oTable.fnGetPosition( this ));
             editableSettings.error.call(this,data);
           },
           success: function (data) {
-            value = countries_flat[value];
-            editableSettings.success.call(this,entity,"country",value);
+            CRM.alert(parties.values[row].organization_name ,countries_flat[value] +" "+ ts('Saved'), 'success');
           }
         });
       } else {
@@ -154,12 +151,12 @@ console.log (oTable.fnGetPosition( this ));
             editableSettings.error.call(this,data);
           },
           success: function (data) {
-            value = countries_flat[value];
             parties.values[row].address_id = data.address_id;
-            editableSettings.success.call(this,entity,"country",value);
+            CRM.alert(countries_flat[value]+ " "+ ts('Saved'),parties.values[row].organization_name , 'success');
           }
         });
       }
+      return countries_flat[value];
     },settings);
 
     $(".ui-widget-header").append("<button id='add' class='add_row'>Add</button>");
@@ -169,7 +166,7 @@ console.log (oTable.fnGetPosition( this ));
     });
     $("#new_dialog select#country").append (o);
     
-    var o= "";
+    var o= "<option value=''>-select-</option>";
     $.each(groups, function (i,d) {
       o = o + "<option value='"+d.id+"'>"+d.organization_name+"</option>";
     });
@@ -191,27 +188,32 @@ console.log (oTable.fnGetPosition( this ));
       CRM.api(entity, "create", params, {
         context: this,
         error: function (data) {
-console.log (data);
+          CRM.alert(result.error_message, 'Save error', 'error')
+          console.log (data);
         },
         success: function (data) {
           params["id"]=data["id"];
           params["custom_7"]=groups_flat[params["custom_7"]];
           oTable.fnAddData( params);
           $("#new_dialog").dialog('close');
+          CRM.alert(params.organization_name, 'Saved', 'error')
         }
       });
     });
       
     $("#add").click(function () { $("#new_dialog").dialog('open'); });
 
-
+    $('#contacts select').live('change', function () {
+      $(this).closest("form").submit();
+//      alert("Change Event Triggered On:" + $(this).attr("value"));
+    });
 
 });
 
 {/literal}
 </script>
 
-<table id="example"></table>
+<table id="contacts"></table>
 
 <div id="new_dialog">
 <form>
