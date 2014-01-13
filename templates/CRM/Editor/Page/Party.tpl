@@ -1,13 +1,16 @@
 <h3>Parties</h3>
 
 <script>
+{assign var="epgroup_field" value="custom_9"}
+{assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
 
+var epgroup_field = "{$epgroup_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country"}.values;
 
 var groups = {crmAPI entity="Contact" contact_sub_type="epgroup" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
 
-var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,nick_name,legal_name,country,custom_7" option_sort="organization_name ASC"};
+var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return=$return_party option_sort="organization_name ASC"}.values;
 {literal}
 var groups_flat = {}; 
 
@@ -16,10 +19,11 @@ cj(function($) {
         groups_flat[groups[n].id]=groups[n].organization_name;
     });
     groups_flat[0]="-select-";
+    countries_flat[0]="-select-";
 
-    $.each(parties.values, function(n) {
-      if (parties.values[n].custom_7) {
-        parties.values[n].custom_7=groups_flat[parties.values[n].custom_7];
+    $.each(parties, function(n) {
+      if (parties[n][epgroup_field]) {
+        parties[n][epgroup_field]=groups_flat[parties[n][epgroup_field]];
       };
     });
 
@@ -27,11 +31,11 @@ cj(function($) {
     bJQueryUI: true,
     "bStateSave": true,
     "bPaginate":false,
-    "aaData": parties.values,
+    "aaData": parties,
     "aoColumns": [
 //           { "sTitle": "id",mData:"id"},
         { "sTitle": "name", mDataProp: "organization_name",sClass: "editable"},
-        { "sTitle": "group", mDataProp:"custom_7","sClass": "group" },
+        { "sTitle": "group", mDataProp:epgroup_field,"sClass": "group" },
         { "sTitle": "english", mDataProp:"legal_name","sClass": "editable" },
         { "sTitle": "accronym" , mDataProp:"nick_name","sClass": "editable"},
         { "sTitle": "country", mDataProp:"country", "sClass": "country" }
@@ -84,7 +88,7 @@ console.log (oTable.fnGetPosition( this ));
       pos = oTable.fnGetPosition( this );
       row= pos[0];
       column= pos[2];
-      contact_id=parties.values[row].id;
+      contact_id=parties[row].id;
       field = oTable.fnSettings().aoColumns[column].mData;
       entity="Contact";
       CRM.api(entity, "setvalue", {"field":field,"value":value, "id":contact_id}, {
@@ -93,7 +97,7 @@ console.log (oTable.fnGetPosition( this ));
           editableSettings.error.call(this,data);
         },
         success: function (data) {
-          CRM.alert( ts('Saved') + " " + value,parties.values[row].organization_name, 'success');
+          CRM.alert( ts('Saved') + " " + value,parties[row].organization_name, 'success');
         }
       });
       return value;
@@ -109,15 +113,17 @@ console.log (oTable.fnGetPosition( this ));
       pos = oTable.fnGetPosition( this );
       row= pos[0];
       column= pos[2];
-      contact_id=parties.values[row].id;
       entity="Contact";
-      CRM.api(entity, "create", {"custom_7":value, "id":contact_id}, {
+      var params = {};
+      params["id"]=parties[row].id; 
+      params[epgroup_field]=value; 
+      CRM.api(entity, "create", params, {
         context: this,
         error: function (data) {
           editableSettings.error.call(this,data);
         },
         success: function (data) {
-          CRM.alert( parties.values[row].organization_name , ts('Saved') + " " + groups_flat[value], 'success');
+          CRM.alert( parties[row].organization_name , ts('Saved') + " " + groups_flat[value], 'success');
         }
       });
       return groups_flat[value];
@@ -130,7 +136,7 @@ console.log (oTable.fnGetPosition( this ));
       pos = oTable.fnGetPosition( this );
       row= pos[0];
       column= pos[2];
-      address_id=parties.values[row].address_id;
+      address_id=parties[row].address_id;
       entity="Address";
       if (address_id) {
         CRM.api(entity, "setvalue", {"field":"country_id","value":value, "id":address_id}, {
@@ -139,11 +145,11 @@ console.log (oTable.fnGetPosition( this ));
             editableSettings.error.call(this,data);
           },
           success: function (data) {
-            CRM.alert(parties.values[row].organization_name ,countries_flat[value] +" "+ ts('Saved'), 'success');
+            CRM.alert(parties[row].organization_name ,countries_flat[value] +" "+ ts('Saved'), 'success');
           }
         });
       } else {
-        contact_id=parties.values[row].id;
+        contact_id=parties[row].id;
         CRM.api(entity, "create", 
           {"location_type_id":2,"is_primary":1,"country_id":value, "contact_id":contact_id}, {
           context: this,
@@ -151,8 +157,8 @@ console.log (oTable.fnGetPosition( this ));
             editableSettings.error.call(this,data);
           },
           success: function (data) {
-            parties.values[row].address_id = data.address_id;
-            CRM.alert(countries_flat[value]+ " "+ ts('Saved'),parties.values[row].organization_name , 'success');
+            parties[row].address_id = data.address_id;
+            CRM.alert(countries_flat[value]+ " "+ ts('Saved'),parties[row].organization_name , 'success');
           }
         });
       }
@@ -170,33 +176,35 @@ console.log (oTable.fnGetPosition( this ));
     $.each(groups, function (i,d) {
       o = o + "<option value='"+d.id+"'>"+d.organization_name+"</option>";
     });
-    $("#new_dialog select#custom_7").append (o);
+    $("#new_dialog select#"+epgroup_field).append (o);
     $("#new_dialog").dialog({"modal":true, autoOpen:false}).submit (function (e) {
       e.preventDefault();
-      var fields = ["organization_name", "legal_name", "nick_name", "country","custom_7"];
+      var fields = ["organization_name", "legal_name", "nick_name", "country",epgroup_field];
       var params = {
         "dedupe_check":true,
         "source": "civicrm/party",
+        "sequential": 1,
         "contact_type":"Organization",
         "contact_sub_type":"party"
       };
       $.each(fields, function(id) {
         params[fields[id]]=$("#"+fields[id]).val();
       });
-      params["country"]=countries_flat[params["country"]];
+      params["api.address"]={"location_type_id":2,"is_primary":1,"country_id":params["country"]};
       var entity="contact";
       CRM.api(entity, "create", params, {
         context: this,
         error: function (data) {
-          CRM.alert(result.error_message, 'Save error', 'error')
+          CRM.alert(data.error_message, 'Save error', 'error')
           console.log (data);
         },
         success: function (data) {
           params["id"]=data["id"];
-          params["custom_7"]=groups_flat[params["custom_7"]];
+          params[epgroup_field]=groups_flat[params[epgroup_field]];
+          params["country"]=countries_flat[params["country"]];
           oTable.fnAddData( params);
           $("#new_dialog").dialog('close');
-          CRM.alert(params.organization_name, 'Saved', 'error')
+          CRM.alert(params.organization_name, 'Saved', 'success')
         }
       });
     });
@@ -223,7 +231,7 @@ console.log (oTable.fnGetPosition( this ));
 </div>
 <div class="form-item">
 <label>Group</label>
-<select id="custom_7"  class="form-control ">
+<select id="{$epgroup_field}"  class="form-control ">
 </select>
 </div>
 <div class="form-item">
