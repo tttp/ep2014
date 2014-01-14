@@ -23,7 +23,6 @@ function civicrm_api3_Country_Getstat ($params) {
   while ($dao->fetch()) { 
     $values[] = $dao->toArray(); 
   }
-print_r($values); 
   return civicrm_api3_create_success($values, $params, NULL, NULL, $dao); 
 
 }
