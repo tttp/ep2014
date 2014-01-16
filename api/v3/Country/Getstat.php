@@ -5,9 +5,8 @@
 
 function civicrm_api3_Country_Getstat ($params) {
   $sqlParam = null;
-  $join ="
-   JOIN civicrm_address ON civicrm_address.contact_id = contact.id AND is_primary=true
-   JOIN civicrm_country as country ON civicrm_address.country_id = country.id";
+  $join ="JOIN civicrm_value_ep_1 as candidate ON candidate.entity_id = contact.id 
+   JOIN civicrm_country as country ON country.id = candidate.country_3";
 
   $where = "contact_sub_type = 'mep'";
   if ($params["group"]) {
