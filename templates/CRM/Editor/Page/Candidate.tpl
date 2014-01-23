@@ -1,42 +1,56 @@
-<h3>Candidates</h3>
+<h3>Parties</h3>
 
 <script>
-//var position_field = custom_2, party_field = custom_5
+{assign var="epgroup_field" value="group"}
+{assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
+
+var epgroup_field = "{$epgroup_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country"}.values;
 
-var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,nick_name,legal_name,country" option_sort="organization_name ASC"}.values;
+var groups = {crmAPI entity="Contact" contact_sub_type="epgroup" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
 
-var candidates = {crmAPI entity="Contact" contact_sub_type="candidate" option_limit=1000 return="first_name,last_name,nick_name,country,website,custom_2,custom_5" option_sort="last_name ASC"};
+var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,country" option_sort="organization_name ASC"}.values;
+
+var candidates = {crmAPI entity="Candidate" option_limit=1000 }.values;
 {literal}
-var parties_flat = {};
+var groups_flat = {}, parties_flat = {}; 
 
 cj(function($) {
+    $.each(groups, function(n) {
+        groups_flat[groups[n].id]=groups[n].organization_name;
+    });
+    groups_flat[0]="-select-";
+    countries_flat[0]="-select-";
+
     $.each(parties, function(n) {
         parties_flat[parties[n].id]=parties[n].organization_name;
     });
+    parties_flat[0]="-select-";
 
-    $.each(candidates.values, function(n) {
-      if (candidates.values[n].custom_5) {
-        candidates.values[n].custom_5=parties_flat[candidates.values[n].custom_5];
+    $.each(candidates, function(n) {
+      if (candidates[n]["party"]) {
+        candidates[n]["party"]=parties_flat[parties[n]["party"]];
+      };
+      if (parties[n][epgroup_field]) {
+        parties[n][epgroup_field]=groups_flat[parties[n][epgroup_field]];
       };
     });
 
-    var oTable = $('#example').dataTable( {
+    var oTable = $('#contacts').dataTable( {
     bJQueryUI: true,
     "bStateSave": true,
     "bPaginate":false,
-    "aaData": candidates.values,
+    "aaData": candidates,
     "aoColumns": [
 //           { "sTitle": "id",mData:"id"},
-        { "sTitle": "first name", mDataProp: "first_name",sClass: "editable"},
-        { "sTitle": "last name", mDataProp: "last_name",sClass: "editable"},
-        { "sTitle": "position", mDataProp:"custom_2","sClass": "editable" },
-        { "sTitle": "party", mDataProp:"custom_5","sClass": "group" },
+        { "sTitle": "First Name", mDataProp: "first_name",sClass: "editable"},
+        { "sTitle": "Last Name", mDataProp: "last_name",sClass: "editable"},
+        { "sTitle": "country", mDataProp:"country", "sClass": "country" },
+        { "sTitle": "party" , mDataProp:"party","sClass": "party"},
         { "sTitle": "website" , mDataProp:"website","sClass": "editable"},
         { "sTitle": "facebook" , mDataProp:"facebook","sClass": "editable"},
         { "sTitle": "twitter" , mDataProp:"twitter","sClass": "editable"},
-        { "sTitle": "country", mDataProp:"country", "sClass": "country" }
     ],
     "fnDrawCallback": function () {
 //TODO: add the editable
@@ -57,7 +71,7 @@ cj(function($) {
         },
         success: function(entity,field,value) {
           var $i = $(this);
-          CRM.alert('', ts('Saved'), 'success');
+          CRM.alert(value, ts('Saved'), 'success');
           $i.removeClass ('crm-editable-saving crm-error');
           $i.html(value);
         }
@@ -77,17 +91,16 @@ console.log (oTable.fnGetPosition( this ));
   
         "height": "24px",
         "width": "100%",
-        "placeholder": '<span class="crm-editable-placeholder">Click to edit</span>'
-  
+        "placeholder": '<span class="crm-editable-placeholder">Click to edit</span>',
+        "onblur": "ignore" 
     };
 
     oTable.$('td.editable').editable( function(value,settings) {
-console.log ("aaa");
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
       row= pos[0];
       column= pos[2];
-      contact_id=candidates.values[row].id;
+      contact_id=parties[row].id;
       field = oTable.fnSettings().aoColumns[column].mData;
       entity="Contact";
       CRM.api(entity, "setvalue", {"field":field,"value":value, "id":contact_id}, {
@@ -96,33 +109,36 @@ console.log ("aaa");
           editableSettings.error.call(this,data);
         },
         success: function (data) {
-          editableSettings.success.call(this,entity,field,value);
+          CRM.alert( ts('Saved') + " " + value,candidates[row].last_name, 'success');
         }
       });
+      return value;
     },settings);
 
-    /* Apply the jEditable handlers to the eu parties */
+    /* Apply the jEditable handlers to the eu groups */
     settings.type="select";
-    settings.data=parties_flat;
+    settings.data=groups_flat;
     settings.onblur = 'submit';
  
-    oTable.$('td.group').editable( function(value,settings) {
+    oTable.$('td.party').editable( function(value,settings) {
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
       row= pos[0];
       column= pos[2];
-      contact_id=candidates.values[row].id;
       entity="Contact";
-      CRM.api(entity, "create", {"custom_7":value, "id":contact_id}, {
+      var params = {};
+      params["id"]=parties[row].id; 
+      params["party"]=value; 
+      CRM.api(entity, "create", params, {
         context: this,
         error: function (data) {
           editableSettings.error.call(this,data);
         },
         success: function (data) {
-          value = countries[value];
-          editableSettings.success.call(this,entity,"contact",value);
+          CRM.alert( candidates[row].last_name , ts('Saved') + " " + parties_flat[value], 'success');
         }
       });
+      return groups_flat[value];
     },settings);
 
     /* Apply the jEditable handlers to the countries */
@@ -132,7 +148,7 @@ console.log ("aaa");
       pos = oTable.fnGetPosition( this );
       row= pos[0];
       column= pos[2];
-      address_id=candidates.values[row].address_id;
+      address_id=candidates[row].address_id;
       entity="Address";
       if (address_id) {
         CRM.api(entity, "setvalue", {"field":"country_id","value":value, "id":address_id}, {
@@ -141,12 +157,11 @@ console.log ("aaa");
             editableSettings.error.call(this,data);
           },
           success: function (data) {
-            value = countries_flat[value];
-            editableSettings.success.call(this,entity,"country",value);
+            CRM.alert(parties[row].organization_name ,countries_flat[value] +" "+ ts('Saved'), 'success');
           }
         });
       } else {
-        contact_id=candidates.values[row].id;
+        contact_id=candidates[row].id;
         CRM.api(entity, "create", 
           {"location_type_id":2,"is_primary":1,"country_id":value, "contact_id":contact_id}, {
           context: this,
@@ -154,12 +169,12 @@ console.log ("aaa");
             editableSettings.error.call(this,data);
           },
           success: function (data) {
-            value = countries_flat[value];
-            candidates.values[row].address_id = data.address_id;
-            editableSettings.success.call(this,entity,"country",value);
+            parties[row].address_id = data.address_id;
+            CRM.alert(countries_flat[value]+ " "+ ts('Saved'),parties[row].organization_name , 'success');
           }
         });
       }
+      return countries_flat[value];
     },settings);
 
     $(".ui-widget-header").append("<button id='add' class='add_row'>Add</button>");
@@ -169,64 +184,71 @@ console.log ("aaa");
     });
     $("#new_dialog select#country").append (o);
     
-    var o= "";
-    $.each(parties, function (i,d) {
+    var o= "<option value=''>-select-</option>";
+    $.each(groups, function (i,d) {
       o = o + "<option value='"+d.id+"'>"+d.organization_name+"</option>";
     });
-    $("#new_dialog select#custom_7").append (o);
+    $("#new_dialog select#"+epgroup_field).append (o);
     $("#new_dialog").dialog({"modal":true, autoOpen:false}).submit (function (e) {
       e.preventDefault();
-      var fields = ["first_name", "last_name", "nick_name", "country","custom_2","custom_7"];
+      var fields = ["organization_name", "legal_name", "nick_name", "country",epgroup_field];
       var params = {
         "dedupe_check":true,
         "source": "civicrm/candidate",
+        "sequential": 1,
         "contact_type":"Individual",
         "contact_sub_type":"candidate"
       };
       $.each(fields, function(id) {
         params[fields[id]]=$("#"+fields[id]).val();
       });
-      params["country"]=countries_flat[params["country"]];
+      params["api.address"]={"location_type_id":2,"is_primary":1,"country_id":params["country"]};
       var entity="contact";
       CRM.api(entity, "create", params, {
         context: this,
         error: function (data) {
-console.log (data);
+          CRM.alert(data.error_message, 'Save error', 'error')
+          console.log (data);
         },
         success: function (data) {
           params["id"]=data["id"];
-          params["custom_7"]=parties_flat[params["custom_7"]];
+          params[epgroup_field]=groups_flat[params[epgroup_field]];
+          params["country"]=countries_flat[params["country"]];
           oTable.fnAddData( params);
           $("#new_dialog").dialog('close');
+          CRM.alert(params.organization_name, 'Saved', 'success')
         }
       });
     });
       
     $("#add").click(function () { $("#new_dialog").dialog('open'); });
 
-
+    $('#contacts select').live('change', function () {
+      $(this).closest("form").submit();
+//      alert("Change Event Triggered On:" + $(this).attr("value"));
+    });
 
 });
 
 {/literal}
 </script>
 
-<table id="example"></table>
+<table id="contacts"></table>
 
 <div id="new_dialog">
 <form>
 <div class="form-item">
 <label>Name</label>
-<input id="first_name"  class="form-control "/>
+<input id="organization_name"  class="form-control "/>
 </div>
 <div class="form-item">
-<label>Last Name</label>
-<input id="last_name" class="form-control "/>
-</div>
-<div class="form-item">
-<label>Party</label>
-<select id="custom_7"  class="form-control ">
+<label>Group</label>
+<select id="{$epgroup_field}"  class="form-control ">
 </select>
+</div>
+<div class="form-item">
+<label>English Name</label>
+<input id="legal_name" class="form-control "/>
 </div>
 <div class="form-item">
 <label>Accronym</label>
