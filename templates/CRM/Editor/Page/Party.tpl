@@ -2,28 +2,40 @@
 
 <script>
 {assign var="epgroup_field" value="custom_9"}
-{assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
+{assign var="euparty_field" value="custom_10"}
+{assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field,$euparty_field"}
 
 var epgroup_field = "{$epgroup_field}";
+var euparty_field = "{$euparty_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country"}.values;
 
 var groups = {crmAPI entity="Contact" contact_sub_type="epgroup" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
+var euparties = {crmAPI entity="Contact" contact_sub_type="epparty" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
 
 var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return=$return_party option_sort="organization_name ASC"}.values;
 {literal}
 var groups_flat = {}; 
+var euparties_flat = {}; 
 
 cj(function($) {
     $.each(groups, function(n) {
         groups_flat[groups[n].id]=groups[n].organization_name;
     });
     groups_flat[0]="-select-";
+    $.each(euparties, function(n) {
+        euparties_flat[groups[n].id]=euparties[n].organization_name;
+    });
+    euparties_flat[0]="-select-";
+
     countries_flat[0]="-select-";
 
     $.each(parties, function(n) {
       if (parties[n][epgroup_field]) {
         parties[n][epgroup_field]=groups_flat[parties[n][epgroup_field]];
+      };
+      if (parties[n][euparty_field]) {
+        parties[n][euparty_field]=euparties_flat[parties[n][euparty_field]];
       };
     });
 
@@ -36,6 +48,7 @@ cj(function($) {
 //           { "sTitle": "id",mData:"id"},
         { "sTitle": "name", mDataProp: "organization_name",sClass: "editable"},
         { "sTitle": "group", mDataProp:epgroup_field,"sClass": "group" },
+        { "sTitle": "euparty", mDataProp:euparty_field,"sClass": "euparty" },
         { "sTitle": "english", mDataProp:"legal_name","sClass": "editable" },
         { "sTitle": "accronym" , mDataProp:"nick_name","sClass": "editable"},
         { "sTitle": "country", mDataProp:"country", "sClass": "country" }
@@ -68,8 +81,6 @@ cj(function($) {
     /* Apply the jEditable handlers to the table */
     var settings =  {
         "callback": function( sValue, y ) {
-console.log ("callback");
-console.log (oTable.fnGetPosition( this ));
             var aPos = oTable.fnGetPosition( this );
             oTable.fnUpdate( sValue, aPos[0], aPos[1] );
         },
@@ -101,6 +112,32 @@ console.log (oTable.fnGetPosition( this ));
         }
       });
       return value;
+    },settings);
+
+    /* Apply the jEditable handlers to the eu parties */
+    settings.type="select";
+    settings.data=euparties_flat;
+    settings.onblur = 'submit';
+ 
+    oTable.$('td.euparty').editable( function(value,settings) {
+      $(this).addClass ('crm-editable-saving');
+      pos = oTable.fnGetPosition( this );
+      row= pos[0];
+      column= pos[2];
+      entity="Contact";
+      var params = {};
+      params["id"]=parties[row].id; 
+      params[euparty_field]=value; 
+      CRM.api(entity, "create", params, {
+        context: this,
+        error: function (data) {
+          editableSettings.error.call(this,data);
+        },
+        success: function (data) {
+          CRM.alert( parties[row].organization_name , ts('Saved') + " " + euparties_flat[value], 'success');
+        }
+      });
+      return euparties_flat[value];
     },settings);
 
     /* Apply the jEditable handlers to the eu groups */
