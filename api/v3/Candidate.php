@@ -19,7 +19,7 @@ function civicrm_api3_candidate_get ($params) {
     $where .= " AND civicrm_value_ep_1.country_3 = %1";
     $sqlParam =  array(1 => array((int) $params["country"], 'Integer'));
   }
-    $where .= " AND .is_deleted = 0";
+    $where .= " AND c.is_deleted = 0";
 
 
   $sql = "SELECT $select FROM civicrm_contact as c $join WHERE $where";
