@@ -29,8 +29,8 @@ cj(function($) {
 
     $.each(candidates, function(n) {
       if (candidates[n].party) {
-        if (parties_flat[candidates[n].party]) { 
-          candidates[n].party=parties_flat[candidates[n].party];
+        if (parties_flat[candidates[n].country][candidates[n].party]) { 
+          candidates[n].party=parties_flat[candidates[n].country][candidates[n].party];
         } else {
           candidates[n].party="<b>party "+candidates[n].party+" missing</b>";
         }
