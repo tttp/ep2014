@@ -8,33 +8,38 @@ var epgroup_field = "{$epgroup_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country"}.values;
 
-var groups = {crmAPI entity="Contact" contact_sub_type="epgroup" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
+var country_field = "custom_3";
+var party_field = "custom_5";
 
 var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,country" option_sort="organization_name ASC"}.values;
 
 var candidates = {crmAPI entity="Candidate" option_limit=1000 }.values;
 {literal}
-var groups_flat = {}, parties_flat = {}; 
+var parties_flat = {}; 
 
 cj(function($) {
-    $.each(groups, function(n) {
-        groups_flat[groups[n].id]=groups[n].organization_name;
-    });
-    groups_flat[0]="-select-";
     countries_flat[0]="-select-";
 
-    $.each(parties, function(n) {
-        parties_flat[parties[n].id]=parties[n].organization_name;
+    $.each(countries_flat, function (n) {
+      parties_flat[n]= {};
     });
-    parties_flat[0]="-select-";
+    $.each(parties, function(n) {
+        parties_flat[parties[n].country_id][parties[n].id]=parties[n].organization_name;
+    });
 
     $.each(candidates, function(n) {
-      if (candidates[n]["party"]) {
-        candidates[n]["party"]=parties_flat[parties[n]["party"]];
+      if (candidates[n].party) {
+        if (parties_flat[candidates[n].party]) { 
+          candidates[n].party=parties_flat[candidates[n].party];
+        } else {
+          candidates[n].party="<b>party "+candidates[n].party+" missing</b>";
+        }
+      } else {
+        candidates[n].party="";
       };
-      if (parties[n][epgroup_field]) {
-        parties[n][epgroup_field]=groups_flat[parties[n][epgroup_field]];
-      };
+      if (candidates[n].country) {
+        candidates[n].country = countries_flat[candidates[n].country];
+      }
     });
 
     var oTable = $('#contacts').dataTable( {
@@ -43,11 +48,13 @@ cj(function($) {
     "bPaginate":false,
     "aaData": candidates,
     "aoColumns": [
+        //{ "sTitle": "party" , mDataProp:"party","sClass": "party"},
 //           { "sTitle": "id",mData:"id"},
         { "sTitle": "First Name", mDataProp: "first_name",sClass: "editable"},
         { "sTitle": "Last Name", mDataProp: "last_name",sClass: "editable"},
         { "sTitle": "country", mDataProp:"country", "sClass": "country" },
-        { "sTitle": "party" , mDataProp:"party","sClass": "party"},
+        { "sTitle": "party", mDataProp:"party", "sClass": "party" },
+        { "sTitle": "email" , mDataProp:"email","sClass": "editable"},
         { "sTitle": "website" , mDataProp:"website","sClass": "editable"},
         { "sTitle": "facebook" , mDataProp:"facebook","sClass": "editable"},
         { "sTitle": "twitter" , mDataProp:"twitter","sClass": "editable"},
@@ -80,8 +87,6 @@ cj(function($) {
     /* Apply the jEditable handlers to the table */
     var settings =  {
         "callback": function( sValue, y ) {
-console.log ("callback");
-console.log (oTable.fnGetPosition( this ));
             var aPos = oTable.fnGetPosition( this );
             oTable.fnUpdate( sValue, aPos[0], aPos[1] );
         },
@@ -117,7 +122,12 @@ console.log (oTable.fnGetPosition( this ));
 
     /* Apply the jEditable handlers to the eu groups */
     settings.type="select";
-    settings.data=groups_flat;
+    settings.data=function (value,settings) {
+      var pos = oTable.fnGetPosition( this );
+      var row= pos[0];
+      var country_id= Object.keys(countries_flat).filter(function(key) {return countries_flat[key] === candidates[row].country})[0];
+      return parties_flat[country_id];
+    } 
     settings.onblur = 'submit';
  
     oTable.$('td.party').editable( function(value,settings) {
@@ -148,32 +158,19 @@ console.log (oTable.fnGetPosition( this ));
       pos = oTable.fnGetPosition( this );
       row= pos[0];
       column= pos[2];
-      address_id=candidates[row].address_id;
-      entity="Address";
-      if (address_id) {
-        CRM.api(entity, "setvalue", {"field":"country_id","value":value, "id":address_id}, {
-          context: this,
-          error: function (data) {
-            editableSettings.error.call(this,data);
-          },
-          success: function (data) {
-            CRM.alert(parties[row].organization_name ,countries_flat[value] +" "+ ts('Saved'), 'success');
-          }
-        });
-      } else {
-        contact_id=candidates[row].id;
-        CRM.api(entity, "create", 
-          {"location_type_id":2,"is_primary":1,"country_id":value, "contact_id":contact_id}, {
-          context: this,
-          error: function (data) {
-            editableSettings.error.call(this,data);
-          },
-          success: function (data) {
-            parties[row].address_id = data.address_id;
-            CRM.alert(countries_flat[value]+ " "+ ts('Saved'),parties[row].organization_name , 'success');
-          }
-        });
-      }
+      entity="Contact";
+      contact_id=candidates[row].id;
+      var param = {"id": candidates[row].id};
+      param[country_field]=value;
+      CRM.api(entity, "create", param, {
+        context: this,
+        error: function (data) {
+          editableSettings.error.call(this,data);
+        },
+        success: function (data) {
+          CRM.alert(candidates[row].last_name ,countries_flat[value] +" "+ ts('Saved'), 'success');
+        }
+      });
       return countries_flat[value];
     },settings);
 
@@ -185,7 +182,7 @@ console.log (oTable.fnGetPosition( this ));
     $("#new_dialog select#country").append (o);
     
     var o= "<option value=''>-select-</option>";
-    $.each(groups, function (i,d) {
+    $.each(parties, function (i,d) {
       o = o + "<option value='"+d.id+"'>"+d.organization_name+"</option>";
     });
     $("#new_dialog select#"+epgroup_field).append (o);
