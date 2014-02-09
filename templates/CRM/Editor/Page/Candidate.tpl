@@ -1,5 +1,3 @@
-<h3>Parties</h3>
-
 <script>
 {assign var="epgroup_field" value="group"}
 {assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
@@ -18,7 +16,7 @@ var candidates = {crmAPI entity="Candidate" option_limit=1000 }.values;
 var parties_flat = {}; 
 
 cj(function($) {
-    countries_flat[0]="-select-";
+    countries_flat["_"]="-select-";
 
     $.each(countries_flat, function (n) {
       parties_flat[n]= {};
@@ -42,7 +40,35 @@ cj(function($) {
       }
     });
 
+// Set the classes that TableTools uses to something suitable for Bootstrap
+$.extend( true, $.fn.DataTable.TableTools.classes, {
+  "container": "btn-group",
+  "buttons": {
+    "normal": "btn",
+    "disabled": "btn disabled"
+  },
+  "collection": {
+    "container": "DTTT_dropdown dropdown-menu",
+    "buttons": {
+      "normal": "",
+      "disabled": "disabled"
+    }
+  }
+} );
+
+// Have the collection use a bootstrap compatible dropdown
+$.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
+  "collection": {
+    "container": "ul",
+    "button": "li",
+    "liner": "a"
+  }
+} );
     var oTable = $('#contacts').dataTable( {
+    "sDom": "<'row-fluid'<'span6'T><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+    "oTableTools": {
+      "sSwfPath": "/extensions/ep2014/TableTools/swf/copy_csv_xls.swf",
+    },
     bJQueryUI: true,
     "bStateSave": true,
     "bPaginate":false,
@@ -105,10 +131,9 @@ cj(function($) {
       pos = oTable.fnGetPosition( this );
       row= pos[0];
       column= pos[2];
-      contact_id=parties[row].id;
+      contact_id=candidates[row].id;
       field = oTable.fnSettings().aoColumns[column].mData;
-      entity="Contact";
-      CRM.api(entity, "setvalue", {"field":field,"value":value, "id":contact_id}, {
+      CRM.api("candidate", "setvalue", {"field":field,"value":value, "id":contact_id}, {
         context: this,
         error: function (data) {
           editableSettings.error.call(this,data);
@@ -120,12 +145,15 @@ cj(function($) {
       return value;
     },settings);
 
-    /* Apply the jEditable handlers to the eu groups */
+    /* Apply the jEditable handlers to the parties */
     settings.type="select";
     settings.data=function (value,settings) {
       var pos = oTable.fnGetPosition( this );
       var row= pos[0];
-      var country_id= Object.keys(countries_flat).filter(function(key) {return countries_flat[key] === candidates[row].country})[0];
+      var country_id= candidates[row].country;
+      if (isNaN (parseInt(country_id))) {
+        country_id= Object.keys(countries_flat).filter(function(key) {return countries_flat[key] === country_id})[0];
+      }
       return parties_flat[country_id];
     } 
     settings.onblur = 'submit';
@@ -136,19 +164,23 @@ cj(function($) {
       row= pos[0];
       column= pos[2];
       entity="Contact";
+      var country_id= candidates[row].country;
+      if (isNaN (parseInt(country_id))) {
+        country_id= Object.keys(countries_flat).filter(function(key) {return countries_flat[key] === country_id})[0];
+      }
       var params = {};
-      params["id"]=parties[row].id; 
-      params["party"]=value; 
+      params["id"]=candidates[row].id; 
+      params[party_field]=value; 
       CRM.api(entity, "create", params, {
         context: this,
         error: function (data) {
           editableSettings.error.call(this,data);
         },
         success: function (data) {
-          CRM.alert( candidates[row].last_name , ts('Saved') + " " + parties_flat[value], 'success');
+          CRM.alert( candidates[row].last_name , ts('Saved') + " " + parties_flat[country_id][value], 'success');
         }
       });
-      return groups_flat[value];
+      return parties_flat[country_id][value];
     },settings);
 
     /* Apply the jEditable handlers to the countries */
@@ -168,6 +200,7 @@ cj(function($) {
           editableSettings.error.call(this,data);
         },
         success: function (data) {
+          candidates[row].country = value;
           CRM.alert(candidates[row].last_name ,countries_flat[value] +" "+ ts('Saved'), 'success');
         }
       });
@@ -227,32 +260,43 @@ cj(function($) {
 
 });
 
-{/literal}
 </script>
+<style>
+  td {word-break:break-word}
+</style>
+{/literal}
 
 <table id="contacts"></table>
 
 <div id="new_dialog">
 <form>
 <div class="form-item">
-<label>Name</label>
-<input id="organization_name"  class="form-control "/>
+<label>First Name</label>
+<input id="first_name"  class="form-control "/>
+<label>Last Name</label>
+<input id="last_name"  class="form-control "/>
+<label>Email</label>
+<input id="email"  class="form-control "/>
 </div>
 <div class="form-item">
-<label>Group</label>
-<select id="{$epgroup_field}"  class="form-control ">
-</select>
-</div>
-<div class="form-item">
-<label>English Name</label>
-<input id="legal_name" class="form-control "/>
-</div>
-<div class="form-item">
-<label>Accronym</label>
-<input id="nick_name"  class="form-control "/>
 <label>Country</label>
-<select id="country"  class="form-control ">
+<select id="{$country_field}"  class="form-control ">
 </select>
+<label>Party</label>
+<select id="{$party_field}"  class="form-control ">
+</select>
+</div>
+<div class="form-item">
+<label>Website</label>
+<input id="website" class="form-control "/>
+</div>
+<div class="form-item">
+<label>Facebook</label>
+<input id="facebook"  class="form-control "/>
+</div>
+<div class="form-item">
+<label>Twitter</label>
+<input id="twitter"  class="form-control "/>
 </div>
 
 <input type="submit" name="save" class="btn-primary form-submit"/>

@@ -1,4 +1,9 @@
 <?php 
+
+function civicrm_api3_candidate_setvalue ($params) {
+  return civicrm_api("contact","setvalue",$params);
+}
+
 function civicrm_api3_candidate_get ($params) {
 
   $sqlParam = array();
