@@ -1,13 +1,15 @@
 <script>
 {assign var="epgroup_field" value="group"}
+{assign var="country_field" value="custom_3"}
+{assign var="party_field" value="custom_5"}
 {assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
 
 var epgroup_field = "{$epgroup_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country"}.values;
 
-var country_field = "custom_3";
-var party_field = "custom_5";
+var country_field = "{$country_field}";
+var party_field = "{$party_field}";
 
 var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,country" option_sort="organization_name ASC"}.values;
 
@@ -89,7 +91,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
 //TODO: add the editable
     }
   });
-    $(".ui-widget-header").append("<button id='add' class='add_row'>Add</button>");
+    $(".ui-widget-header").append("<button id='add' class='add_row ui-state-default'>Add</button>");
 
    var editableSettings = { 
      callBack:function(data){
@@ -208,17 +210,26 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
       return countries_flat[value];
     },settings);
 
-    var o= "";
+    var o= "<option value=''>-select-</option>";
     $.each(countries, function (i,d) {
       o = o + "<option value='"+d.id+"'>"+d.name+"</option>";
     });
-    $("#new_dialog select#country").append (o);
+    $("#new_dialog select#"+country_field).append (o);
+    $("#new_dialog select#"+country_field).on ("change",function() {
+      var country_id = this.value;
+      if (!country_id) return;
+      var o= "<option value=''>-select-</option>";
+      $.each(parties_flat[country_id],function (i,d) {
+        o = o + "<option value='"+i+"'>"+d+"</option>";
+      });
+      $("#new_dialog select#"+party_field).html(o);
+    });
     
     var o= "<option value=''>-select-</option>";
     $.each(parties, function (i,d) {
       o = o + "<option value='"+d.id+"'>"+d.organization_name+"</option>";
     });
-    $("#new_dialog select#"+epgroup_field).append (o);
+    $("#new_dialog select#"+party_field).append (o);
     $("#new_dialog").dialog({"modal":true, autoOpen:false}).submit (function (e) {
       e.preventDefault();
       var fields = ["organization_name", "legal_name", "nick_name", "country",epgroup_field];
@@ -301,6 +312,6 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
 <input id="twitter"  class="form-control "/>
 </div>
 
-<input type="submit" name="save" class="btn-primary form-submit"/>
+<input type="submit" value="Add" name="save" class="btn-primary form-submit"/>
 </form>
 </div>
