@@ -65,7 +65,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
   }
 } );
     var oTable = $('#contacts').dataTable( {
-    "sDom": "<'row-fluid'<'span6'T><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+    "sDom": "<'ui-widget-header'<'span6'T><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "oTableTools": {
       "sSwfPath": "/extensions/ep2014/TableTools/swf/copy_csv_xls.swf",
     },
@@ -89,6 +89,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
 //TODO: add the editable
     }
   });
+    $(".ui-widget-header").append("<button id='add' class='add_row'>Add</button>");
 
    var editableSettings = { 
      callBack:function(data){
@@ -207,7 +208,6 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
       return countries_flat[value];
     },settings);
 
-    $(".ui-widget-header").append("<button id='add' class='add_row'>Add</button>");
     var o= "";
     $.each(countries, function (i,d) {
       o = o + "<option value='"+d.id+"'>"+d.name+"</option>";
@@ -262,6 +262,8 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
 
 </script>
 <style>
+.DTTT_button {padding:0 10px;}
+.DTTT_container {float:left;}
   td {word-break:break-word}
 </style>
 {/literal}
