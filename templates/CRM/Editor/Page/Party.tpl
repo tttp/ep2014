@@ -52,12 +52,13 @@ cj(function($) {
     });
 
     var oTable = $('#contacts').dataTable( {
+    aaSorting:[],
+bSortClasses: false,
     bJQueryUI: true,
-    "bStateSave": true,
+    bStateSave: false,
     "bPaginate":false,
     "aaData": parties,
     "aoColumns": [
-//           { "sTitle": "id",mData:"id"},
         { "sTitle": "name", mDataProp: "organization_name",sClass: "editable"},
         { "sTitle": "group", mDataProp:epgroup_field,"sClass": "group" },
         { "sTitle": "euparty", mDataProp:euparty_field,"sClass": "euparty" },
