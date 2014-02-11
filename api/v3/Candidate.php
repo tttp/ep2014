@@ -1,7 +1,20 @@
 <?php 
 
 function civicrm_api3_candidate_setvalue ($params) {
-  return civicrm_api("contact","setvalue",$params);
+  if ($params["field"] == "email") {
+     $r=civicrm_api3("email","get",array("is_primary"=>1,"contact_id"=>$params["id]));
+     if ($r["count"]==1) {
+        return civicrm_api3("email","create",array("id"=>$r["id"],"email"=>$params["email"]));
+     } else {
+        return civicrm_api3("email","create",array("contact_id"=>$params["id"],"is_primary"=>1,"email"=>$params["email"]));
+     }
+  }
+  if ($params["field"] == "facebook") {
+  }
+  if ($params["field"] == "twitter") {
+    
+  }
+  return civicrm_api3("contact","setvalue",$params);
 }
 
 function civicrm_api3_candidate_get ($params) {
