@@ -58,14 +58,6 @@ bSortClasses: false,
     bStateSave: false,
     "bPaginate":false,
     "aaData": parties,
-    "aaoColumns": [
-        { "sTitle": "name", mDataProp: "organization_name",sClass: "editable"},
-        { "sTitle": "group", mDataProp:epgroup_field,"sClass": "group" },
-        { "sTitle": "euparty", mDataProp:euparty_field,"sClass": "euparty" },
-        { "sTitle": "english", mDataProp:"legal_name","sClass": "editable" },
-        { "sTitle": "accronym" , mDataProp:"nick_name","sClass": "editable"},
-        { "sTitle": "country", mDataProp:"country", "sClass": "country" }
-    ],
     aoColumnDefs: [
       {"aTargets":[0],sTitle:"",mData:"id",mRender:function (data,type,full) {return "<a class='ui-icon ui-icon-person' href='"+CRM.url('civicrm/contact/view', {"reset": 1, "cid":data})+"'></a>";}},
       {"aTargets":[1], "sTitle": "name", mData: "organization_name",sClass: "editable"},
