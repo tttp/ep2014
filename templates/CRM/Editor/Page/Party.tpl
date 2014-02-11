@@ -58,13 +58,23 @@ bSortClasses: false,
     bStateSave: false,
     "bPaginate":false,
     "aaData": parties,
-    "aoColumns": [
+    "aaoColumns": [
         { "sTitle": "name", mDataProp: "organization_name",sClass: "editable"},
         { "sTitle": "group", mDataProp:epgroup_field,"sClass": "group" },
         { "sTitle": "euparty", mDataProp:euparty_field,"sClass": "euparty" },
         { "sTitle": "english", mDataProp:"legal_name","sClass": "editable" },
         { "sTitle": "accronym" , mDataProp:"nick_name","sClass": "editable"},
         { "sTitle": "country", mDataProp:"country", "sClass": "country" }
+    ],
+    aoColumnDefs: [
+      {"aTargets":[0],sTitle:"",mData:"id",mRender:function (data,type,full) {return "<a class='ui-icon ui-icon-person' href='"+CRM.url('civicrm/contact/view', {"reset": 1, "cid":data})+"'></a>";}},
+      {"aTargets":[1], "sTitle": "name", mData: "organization_name",sClass: "editable"},
+      { "aTargets":[2],"sTitle": "group", mData:epgroup_field,"sClass": "group" },
+      { "aTargets":[3],"sTitle": "euparty", mData:euparty_field,"sClass": "euparty" },
+      { "aTargets":[4],"sTitle": "english", mData:"legal_name","sClass": "editable" },
+      { "aTargets":[5],"sTitle": "accronym" , mData:"nick_name","sClass": "editable"},
+      { "aTargets":[6],"sTitle": "country", mData:"country", "sClass": "country" }
+      
     ],
     "fnDrawCallback": function () {
 //TODO: add the editable
@@ -268,8 +278,11 @@ bSortClasses: false,
 
 });
 
-{/literal}
 </script>
+<style>
+.ui-icon-person {cursor:pointer}
+</style>
+{/literal}
 
 <table id="contacts"></table>
 
@@ -299,3 +312,4 @@ bSortClasses: false,
 <input type="submit" name="save" class="btn-primary form-submit"/>
 </form>
 </div>
+
