@@ -71,6 +71,8 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     "oTableTools": {
       "sSwfPath": "/extensions/ep2014/TableTools/swf/copy_csv_xls.swf",
     },
+    aaSorting:[],
+    bSortClasses: false,
     bJQueryUI: true,
     "bStateSave": true,
     "bPaginate":false,
@@ -275,7 +277,9 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
 <style>
 .DTTT_button {padding:0 10px;}
 .DTTT_container {float:left;}
-  td {word-break:break-word}
+td {word-break:break-word}
+.col-sm-9 {width:100%;}
+.col-sm-3 {display:none;}
 </style>
 {/literal}
 
