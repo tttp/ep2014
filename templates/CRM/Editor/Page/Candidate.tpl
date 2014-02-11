@@ -78,7 +78,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     "bPaginate":false,
     "aaData": candidates,
     aoColumnDefs: [
-      {"aTargets":[0],sTitle:"",mData:"id",mRender:function (data,type,full) {return "<a class='ui-icon ui-icon-person' href='"+CRM.url('civicrm/contact/view', {"reset": 1, "cid":data})+"'></a>";}},
+      {"aTargets":[0],sTitle:"",mData:"id",mRender:function (data,type,full) {return "<a class='ui-icon ui-icon-person' href='"+CRM.url('civicrm/contact/view', {"reset": 1, "cid":data})+"'></a><a class='ui-icon ui-icon-search'></a>";}},
         { "aTargets":[1],"sTitle": "First Name", mDataProp: "first_name",sClass: "editable"},
         { "aTargets":[2],"sTitle": "Last Name", mDataProp: "last_name",sClass: "editable"},
         { "aTargets":[3],"sTitle": "country", mDataProp:"country", "sClass": "country" },
@@ -270,6 +270,11 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
 //      alert("Change Event Triggered On:" + $(this).attr("value"));
     });
 
+   $(".ui-icon-search").on("click",function() {
+      var row = oTable.fnGetPosition( $(this).closest("td")[0] )[0];
+      var q=candidates[row].first_name+ " "+candidates[row].last_name +" " + candidates[row].party;
+      window.open("https://www.google.com/search?q="+q, '_blank');
+   });
 });
 
 </script>
@@ -279,6 +284,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
 td {word-break:break-word}
 .col-sm-9 {width:100%;}
 .col-sm-3 {display:none;}
+.ui-icon {cursor:pointer;}
 </style>
 {/literal}
 
