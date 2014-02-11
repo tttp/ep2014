@@ -77,17 +77,16 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     "bStateSave": true,
     "bPaginate":false,
     "aaData": candidates,
-    "aoColumns": [
-        //{ "sTitle": "party" , mDataProp:"party","sClass": "party"},
-//           { "sTitle": "id",mData:"id"},
-        { "sTitle": "First Name", mDataProp: "first_name",sClass: "editable"},
-        { "sTitle": "Last Name", mDataProp: "last_name",sClass: "editable"},
-        { "sTitle": "country", mDataProp:"country", "sClass": "country" },
-        { "sTitle": "party", mDataProp:"party", "sClass": "party" },
-        { "sTitle": "email" , mDataProp:"email","sClass": "editable"},
-        { "sTitle": "website" , mDataProp:"website","sClass": "editable"},
-        { "sTitle": "facebook" , mDataProp:"facebook","sClass": "editable"},
-        { "sTitle": "twitter" , mDataProp:"twitter","sClass": "editable"},
+    aoColumnDefs: [
+      {"aTargets":[0],sTitle:"",mData:"id",mRender:function (data,type,full) {return "<a class='ui-icon ui-icon-person' href='"+CRM.url('civicrm/contact/view', {"reset": 1, "cid":data})+"'></a>";}},
+        { "aTargets":[1],"sTitle": "First Name", mDataProp: "first_name",sClass: "editable"},
+        { "aTargets":[2],"sTitle": "Last Name", mDataProp: "last_name",sClass: "editable"},
+        { "aTargets":[3],"sTitle": "country", mDataProp:"country", "sClass": "country" },
+        { "aTargets":[4],"sTitle": "party", mDataProp:"party", "sClass": "party" },
+        { "aTargets":[5],"sTitle": "email" , mDataProp:"email","sClass": "editable"},
+        { "aTargets":[6],"sTitle": "website" , mDataProp:"website","sClass": "editable"},
+        { "aTargets":[7],"sTitle": "facebook" , mDataProp:"facebook","sClass": "editable"},
+        { "aTargets":[8],"sTitle": "twitter" , mDataProp:"twitter","sClass": "editable"},
     ],
     "fnDrawCallback": function () {
 //TODO: add the editable
