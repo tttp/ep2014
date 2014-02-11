@@ -24,18 +24,30 @@ cj(function($) {
     });
     groups_flat[0]="-select-";
     $.each(euparties, function(n) {
-        euparties_flat[groups[n].id]=euparties[n].organization_name;
+        euparties_flat[euparties[n].id]=euparties[n].organization_name;
     });
     euparties_flat[0]="-select-";
 
     countries_flat[0]="-select-";
 
-    $.each(parties, function(n) {
+    $.each(parties, function(n,p) {
       if (parties[n][epgroup_field]) {
-        parties[n][epgroup_field]=groups_flat[parties[n][epgroup_field]];
+        if (groups_flat[parties[n][epgroup_field]]) {
+          parties[n][epgroup_field]=groups_flat[parties[n][epgroup_field]];
+        } else {
+          parties[n][epgroup_field]= "<b>missing "+parties[n][epgroup_field]+"</b>";
+        }
+      } else {
+        parties[n][epgroup_field]="";
       };
       if (parties[n][euparty_field]) {
-        parties[n][euparty_field]=euparties_flat[parties[n][euparty_field]];
+        if (euparties_flat[parties[n][euparty_field]])
+          parties[n][euparty_field]=euparties_flat[parties[n][euparty_field]];
+        else {
+          parties[n][euparty_field]="<b>missing "+parties[n][euparty_field]+"</b>";
+        }
+      } else {
+        parties[n][euparty_field]="";
       };
     });
 
