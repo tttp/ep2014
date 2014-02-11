@@ -2,17 +2,21 @@
 
 function civicrm_api3_candidate_setvalue ($params) {
   if ($params["field"] == "email") {
-     $r=civicrm_api3("email","get",array("is_primary"=>1,"contact_id"=>$params["id]));
+     $r=civicrm_api3("email","get",array("is_primary"=>1,"contact_id"=>$params["id"]));
      if ($r["count"]==1) {
-        return civicrm_api3("email","create",array("id"=>$r["id"],"email"=>$params["email"]));
+        return civicrm_api3("email","create",array("id"=>$r["id"],"email"=>$params["value"]));
      } else {
-        return civicrm_api3("email","create",array("contact_id"=>$params["id"],"is_primary"=>1,"email"=>$params["email"]));
+        return civicrm_api3("email","create",array("contact_id"=>$params["id"],"is_primary"=>1,"email"=>$params["value"]));
      }
   }
-  if ($params["field"] == "facebook") {
-  }
-  if ($params["field"] == "twitter") {
-    
+  if ($params["field"] == "facebook" || $params["field"] == "twitter" || $params["field"] == "website")  {
+     if ($params["field"] == "website") $params["field"] = "home";
+     $r=civicrm_api3("website","get",array("website_type_id"=>$params["field"],"contact_id"=>$params["id"]));
+     if ($r["count"]==1) {
+        return civicrm_api3("website","create",array("id"=>$r["id"],"url"=>$params["value"]));
+     } else {
+        return civicrm_api3("website","create",array("contact_id"=>$params["id"],"website_type_id"=>$params["field"],"url"=>$params["value"]));
+     } 
   }
   return civicrm_api3("contact","setvalue",$params);
 }
