@@ -18,4 +18,10 @@
     <title>Candidate</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/candidate/view</path>
+    <page_callback>CRM_Editor_Page_ROCandidate</page_callback>
+    <title>View Candidates</title>
+    <access_arguments>view candidate</access_arguments>
+  </item>
 </menu>
