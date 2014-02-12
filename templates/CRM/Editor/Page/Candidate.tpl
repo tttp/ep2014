@@ -19,6 +19,7 @@ var parties_flat = {};
 
 cj(function($) {
     countries_flat["_"]="-select-";
+    $("h1").prepend(candidates.length);
 
     $.each(countries_flat, function (n) {
       parties_flat[n]= {};
