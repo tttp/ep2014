@@ -1,7 +1,14 @@
 <?php 
 
 function civicrm_api3_candidate_create ($params) {
-  $web_fields = array ("facebook","twitter");
+  if (array_key_exists ("website",$params)) {
+    $params["api.website.create"] = array ("url"=>$params["website"],"website_type_id"=>"home");
+  }
+  foreach ( array ("facebook","twitter") as $type) {
+    if (array_key_exists ($type,$params)) {
+      $params["api.website.create.".$type] = array ("url"=>$params[$type], "website_type_id"=>$type);
+    }
+  };
   return civicrm_api3("contact","create",$params);
 }
 

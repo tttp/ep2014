@@ -259,7 +259,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
           params["country"]=countries_flat[params[country_field]];
           oTable.fnAddData( params);
           $("#new_dialog").dialog('close');
-          CRM.alert(params.organization_name, 'Saved', 'success')
+          CRM.alert(params.last_name, 'Saved', 'success')
         }
       });
     });
