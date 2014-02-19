@@ -234,7 +234,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     $("#new_dialog select#"+party_field).append (o);
     $("#new_dialog").dialog({"modal":true, autoOpen:false}).submit (function (e) {
       e.preventDefault();
-      var fields = ["first_name", "last_name", "website", "facebook", "twitter",party_field,country_field];
+      var fields = ["first_name", "last_name", "website", "facebook", "twitter","email",party_field,country_field];
       var params = {
         "dedupe_check":true,
         "source": "civicrm/candidate",
@@ -245,8 +245,8 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
       $.each(fields, function(id) {
         params[fields[id]]=$("#"+fields[id]).val();
       });
-      params["api.address"]={"location_type_id":2,"is_primary":1,"country_id":params["country"]};
-      var entity="contact";
+//      params["api.address"]={"location_type_id":2,"is_primary":1,"country_id":params["country"]};
+      var entity="candidate";
       CRM.api(entity, "create", params, {
         context: this,
         error: function (data) {
@@ -255,8 +255,8 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
         },
         success: function (data) {
           params["id"]=data["id"];
-          params[party_field]=party_flat[params[country_field] ][params[party_field] ];
-          params[country_field]=countries_flat[params[country_field]];
+          params["party"]=parties_flat[params[country_field] ][params[party_field] ];
+          params["country"]=countries_flat[params[country_field]];
           oTable.fnAddData( params);
           $("#new_dialog").dialog('close');
           CRM.alert(params.organization_name, 'Saved', 'success')

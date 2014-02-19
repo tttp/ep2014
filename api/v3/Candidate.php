@@ -1,5 +1,10 @@
 <?php 
 
+function civicrm_api3_candidate_create ($params) {
+  $web_fields = array ("facebook","twitter");
+  return civicrm_api3("contact","create",$params);
+}
+
 function civicrm_api3_candidate_setvalue ($params) {
   if ($params["field"] == "email") {
      $r=civicrm_api3("email","get",array("is_primary"=>1,"contact_id"=>$params["id"]));
