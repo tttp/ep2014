@@ -1,6 +1,11 @@
 <?php 
 
 function civicrm_api3_candidate_create ($params) {
+  foreach (array ("country"=>"custom_3","constituency"=>"custom_4","party"=>"custom_5") as $a => $f) {
+    if (array_key_exists ($a,$params)) {
+      $params[$f] = $params[$a];
+    }
+  }
   if (array_key_exists ("website",$params)) {
     $params["api.website.create"] = array ("url"=>$params["website"],"website_type_id"=>"home");
   }
