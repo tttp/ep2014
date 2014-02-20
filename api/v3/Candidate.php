@@ -7,11 +7,16 @@ function civicrm_api3_candidate_create ($params) {
     }
   }
   if (array_key_exists ("website",$params)) {
-    $params["api.website.create"] = array ("url"=>$params["website"],"website_type_id"=>"home");
+    $params["api.website.create"] = array ("url"=>$params["website"],"website_type_id"=>"home"
+      , 'options' => array('match' => array ("website","website_type_id","contact_id"))
+    );
   }
   foreach ( array ("facebook","twitter") as $type) {
     if (array_key_exists ($type,$params)) {
-      $params["api.website.create.".$type] = array ("url"=>$params[$type], "website_type_id"=>$type);
+      if ($params[$type][0]) $params[$type] = "http://".$type.".com/". substr($params[$type],1);
+      $params["api.website.create.".$type] = array ("url"=>$params[$type], "website_type_id"=>$type
+        , 'options' => array('match' => array ("website","website_type_id","contact_id"))
+      );
     }
   };
   return civicrm_api3("contact","create",$params);
