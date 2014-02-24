@@ -79,3 +79,8 @@ function editor_civicrm_managed(&$entities) {
 function editor_civicrm_caseTypes(&$caseTypes) {
   _editor_civix_civicrm_caseTypes($caseTypes);
 }
+
+function editor_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions)
+{
+    $permissions['candidate']['create'] = array('add contacts');
+}
