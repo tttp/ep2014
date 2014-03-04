@@ -13,7 +13,7 @@ var party_field = "{$party_field}";
 
 var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,country" option_sort="organization_name ASC"}.values;
 
-var candidates = {crmAPI entity="Candidate" option_limit=1000 }.values;
+var candidates = {crmAPI entity="Candidate" option_limit=1000}.values;
 {literal}
 var parties_flat = {}; 
 
@@ -30,7 +30,7 @@ cj(function($) {
 
     $.each(candidates, function(n) {
       if (candidates[n].party) {
-        if (parties_flat[candidates[n].country][candidates[n].party]) { 
+        if (candidates[n].country && parties_flat[candidates[n].country][candidates[n].party]) { 
           candidates[n].party=parties_flat[candidates[n].country][candidates[n].party];
         } else {
           candidates[n].party="<b>party "+candidates[n].party+" missing</b>";
