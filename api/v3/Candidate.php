@@ -1,5 +1,19 @@
 <?php 
 
+function civicrm_api3_candidate_denormalise ($params) {
+  CRM_Core_DAO::dropTriggers("civicrm_value_ep_1");
+  CRM_Core_DAO::dropTriggers("civicrm_value_ep_group_3");
+  $sql="update civicrm_value_ep_1 as candidate, civicrm_contact as p,civicrm_value_ep_group_3 as pcustom set euparty_18=eu_party_10,group_6=ep_group_9 where candidate.party_5=p.id AND pcustom.entity_id=p.id AND euparty_18 is NULL AND group_6 is NULL;";
+  $values = array("sql"=>$sql);
+  $dummy = null;
+  return civicrm_api3_create_success($values, $params, NULL, NULL, $dao); 
+//  $dao = CRM_Core_DAO::executeQuery($sql); 
+  CRM_Core_DAO::triggerRebuild("civicrm_value_ep_1");
+  CRM_Core_DAO::triggerRebuild("civicrm_value_ep_group_3");
+  CRM_Core_DAO::triggerRebuild("civicrm_contact");
+};
+
+
 function civicrm_api3_candidate_create ($params) {
   foreach (array ("position"=>"custom_2","country"=>"custom_3","constituency"=>"custom_4","party"=>"custom_5") as $a => $f) {
     if (array_key_exists ($a,$params)) {
