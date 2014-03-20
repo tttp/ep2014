@@ -131,7 +131,8 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
         "onblur": "ignore" 
     };
 
-    oTable.$('td.editable').editable( function(value,settings) {
+  $("tbody").on ("click","td.editable",function() {
+    $(this).editable( function(value,settings) {
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
       row= pos[0];
@@ -148,11 +149,13 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
         }
       });
       return value;
-    },settings);
+    },settings).trigger("click");
+  });
 
     /* Apply the jEditable handlers to the parties */
-    settings.type="select";
-    settings.data=function (value,settings) {
+    psettings=$.extend({},settings);
+    psettings.type="select";
+    psettings.data=function (value,settings) {
       var pos = oTable.fnGetPosition( this );
       var row= pos[0];
       var country_id= candidates[row].country;
@@ -161,7 +164,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
       }
       return parties_flat[country_id];
     } 
-    settings.onblur = 'submit';
+    psettings.onblur = 'submit';
  
     oTable.$('td.party').editable( function(value,settings) {
       $(this).addClass ('crm-editable-saving');
@@ -186,10 +189,10 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
         }
       });
       return parties_flat[country_id][value];
-    },settings);
+    },psettings);
 
     /* Apply the jEditable handlers to the countries */
-    settings.data=countries_flat;
+    psettings.data=countries_flat;
     oTable.$('td.country').editable( function(value,settings) {
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
@@ -210,7 +213,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
         }
       });
       return countries_flat[value];
-    },settings);
+    },psettings);
 
     var o= "<option value=''>-select-</option>";
     $.each(countries, function (i,d) {

@@ -27,10 +27,9 @@ cj(function($) {
     $.each(parties, function(n) {
         parties_flat[parties[n].country_id][parties[n].id]=parties[n].organization_name;
     });
-
     $.each(candidates, function(n) {
       if (candidates[n].party) {
-        if (parties_flat[candidates[n].country][candidates[n].party]) { 
+        if (candidates[n].country && parties_flat[candidates[n].country][candidates[n].party]) { 
           candidates[n].party=parties_flat[candidates[n].country][candidates[n].party];
         } else {
           candidates[n].party="<b>party "+candidates[n].party+" missing</b>";
@@ -42,6 +41,7 @@ cj(function($) {
         candidates[n].country = countries_flat[candidates[n].country];
       }
     });
+
 
 // Set the classes that TableTools uses to something suitable for Bootstrap
 $.extend( true, $.fn.DataTable.TableTools.classes, {
