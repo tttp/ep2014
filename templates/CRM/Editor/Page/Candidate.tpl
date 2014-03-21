@@ -15,7 +15,7 @@ var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=100
 
 var candidates = {crmAPI entity="Candidate" option_limit=1000}.values;
 {literal}
-var parties_flat = {}; 
+var parties_flat = {"_": {}}; 
 
 cj(function($) {
     countries_flat["_"]="-select-";
@@ -25,7 +25,9 @@ cj(function($) {
       parties_flat[n]= {};
     });
     $.each(parties, function(n) {
-        parties_flat[parties[n].country_id][parties[n].id]=parties[n].organization_name;
+      if (!parties[n].country_id)
+        parties[n].country_id = "_";
+      parties_flat[parties[n].country_id][parties[n].id]=parties[n].organization_name;
     });
 
     $.each(candidates, function(n) {
