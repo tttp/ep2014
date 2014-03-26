@@ -80,7 +80,6 @@ function civicrm_api3_candidate_get ($params) {
 
 
   $sql = "SELECT $select FROM civicrm_contact as c $join WHERE $where";
-die ($sql);
   $dao = CRM_Core_DAO::executeQuery($sql, $sqlParam); 
 
   $values = array(); 
