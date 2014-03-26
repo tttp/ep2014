@@ -3,7 +3,8 @@
 function civicrm_api3_candidate_denormalise ($params) {
   CRM_Core_DAO::dropTriggers("civicrm_value_ep_1");
   CRM_Core_DAO::dropTriggers("civicrm_value_ep_group_3");
-  $sql="update civicrm_value_ep_1 as candidate, civicrm_contact as p,civicrm_value_ep_group_3 as pcustom set euparty_18=eu_party_10,group_6=ep_group_9 where candidate.party_5=p.id AND pcustom.entity_id=p.id AND euparty_18 is NULL AND group_6 is NULL;";
+  $sql="update civicrm_value_ep_1 as candidate, civicrm_contact as p,civicrm_value_ep_group_3 as pcustom set euparty_18=eu_party_10,group_6=ep_group_9 where candidate.party_5=p.id AND pcustom.entity_id=p.id";
+//always update AND euparty_18 is NULL AND group_6 is NULL;";
   $dao = CRM_Core_DAO::executeQuery($sql); 
   return civicrm_api3_create_success($values, $params, NULL, NULL, $dao); 
   CRM_Core_DAO::triggerRebuild("civicrm_value_ep_1");
@@ -79,6 +80,7 @@ function civicrm_api3_candidate_get ($params) {
 
 
   $sql = "SELECT $select FROM civicrm_contact as c $join WHERE $where";
+die ($sql);
   $dao = CRM_Core_DAO::executeQuery($sql, $sqlParam); 
 
   $values = array(); 
