@@ -1,5 +1,13 @@
 <?php 
 
+function civicrm_api3_candidate_fix ($params) {
+  $sql = "delete from civicrm_website where url is NULL;";
+  CRM_Core_DAO::executeQuery($sql);
+   $dao = $sql = "delete w1 from civicrm_website w1, civicrm_website w2 where w1.id < w2.id AND w1.contact_id = w2.contact_id AND w1.website_type_id = w2.website_type_id;";
+  CRM_Core_DAO::executeQuery($sql);
+  return civicrm_api3_create_success($values, $params, NULL, NULL, $dao); 
+}
+
 function civicrm_api3_candidate_denormalise ($params) {
   CRM_Core_DAO::dropTriggers("civicrm_value_ep_1");
   CRM_Core_DAO::dropTriggers("civicrm_value_ep_group_3");
