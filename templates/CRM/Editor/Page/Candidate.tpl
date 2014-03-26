@@ -133,7 +133,8 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
         "onblur": "ignore" 
     };
 
-  $("tbody").on ("click","td.editable",function() {
+  $("tbody").on ("click","td.editable",function(event) {
+    event.preventDefault();
     $(this).editable( function(value,settings) {
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
