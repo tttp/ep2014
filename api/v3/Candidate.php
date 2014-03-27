@@ -1,6 +1,50 @@
 <?php 
 
 function civicrm_api3_candidate_fix ($params) {
+  $urlfixes = array (
+   "wwwfacebook.com" => "www.facebook.com",
+   "/ttp://" => "",
+   "/ttps://www.facebook.com" => "",
+   "/ttps://de-de.facebook.com" => "",
+   "/ww.facebook.com" => "",
+   "hhttps://www.facebook.com/" => "https://www.facebook.com/",
+   "http://https://" => "https://",
+   "facebook.comwww.facebook.com" => "www.facebook.com",
+
+   "?sk=info" => "",
+   "&sk=info" => "",
+   "?ref=ts" => "",
+   "&ref=ts" => "",
+   "?fref=ts" => "",
+   "&fref=ts" => "",
+   "&sk=wall" => "",
+   "&ref=tn_tnmn" => "",
+   "?ref=home" => "",
+   "?ref=logo" => "",
+   "?sk=wall" => "",
+   "?ref=sgm" => "",
+   "?ref=hl" => "",
+   "?ref=tn_tnmn" => "",
+   "?ref=stream" => "",
+   "?ref=mf" => "",
+   "?ref=profile" => "",
+
+   "/home.php#!" => "",
+   "/#!/profile.php" => "/profile.php",
+
+   "http://facebook.com/" => "https://www.facebook.com/",
+   "http://www.facebook.com/" => "https://www.facebook.com/",
+   "https://facebook.com/" => "https://www.facebook.com/",
+   "https://www.facebook.com/#!/" => "https://www.facebook.com/",
+  );
+  foreach ($urlfixes as $from => $to) {
+    $sql = "UPDATE civicrm_website set url = REPLACE(url, %1,%2) WHERE website_type_id=3 AND url like %3";
+    $dao = CRM_Core_DAO::executeQuery($sql, array (
+      1=>array ($from,"String"), 
+      2=> array ($to,"String"), 
+      3=>array ("%$from%","String")
+    ));   
+  }
   $sql = "delete from civicrm_website where url is NULL;";
   CRM_Core_DAO::executeQuery($sql);
    $dao = $sql = "delete w1 from civicrm_website w1, civicrm_website w2 where w1.id < w2.id AND w1.contact_id = w2.contact_id AND w1.website_type_id = w2.website_type_id;";
