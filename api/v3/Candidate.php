@@ -77,7 +77,8 @@ function civicrm_api3_candidate_create ($params) {
   }
   foreach ( array ("facebook","twitter") as $type) {
     if (array_key_exists ($type,$params)) {
-      if ($params[$type][0]) $params[$type] = "http://".$type.".com/". substr($params[$type],1);
+      if ($params[$type][0]) 
+        $params[$type] = "https://".$type.".com/". substr($params[$type],1);
       $params["api.website.create.".$type] = array ("url"=>$params[$type], "website_type_id"=>$type
         , 'options' => array('match' => array ("website","website_type_id","contact_id"))
       );
@@ -110,7 +111,7 @@ function civicrm_api3_candidate_setvalue ($params) {
 function civicrm_api3_candidate_get ($params) {
 
   $sqlParam = array();
-  $select ="c.id as id, first_name, last_name, email, civicrm_email.id as email_id, civicrm_value_ep_1.id as candidate_id, country_3 as country, position_2 as position, party_5 as party, website.url as website, facebook.url as facebook, twitter.url as twitter, image_URL";
+  $select ="c.id as id, first_name, last_name, email, civicrm_email.id as email_id, civicrm_value_ep_1.id as candidate_id, country_3 as country, position_2 as position, party_5 as party, constituency_4 as constituency, website.url as website, facebook.url as facebook, twitter.url as twitter, image_URL";
   $join="LEFT JOIN civicrm_value_ep_1 ON civicrm_value_ep_1.entity_id = c.id ";
   $join .= "LEFT JOIN civicrm_email ON c.id = civicrm_email.contact_id AND is_primary=1 ";
   $join .= "LEFT JOIN civicrm_website as website ON website.contact_id=c.id AND website.website_type_id=1 ";
