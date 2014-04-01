@@ -36,6 +36,7 @@ var epgroups_color = {
 "ECR":"darkblue",
 "Non-attached Members":"grey",
 "NA/NI":"grey",
+"EDP":"cyan",
 "AECR":"brown",
 "None":"pink"
 };
