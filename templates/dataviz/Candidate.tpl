@@ -53,7 +53,7 @@ var parties_map = {};
 
 cj(function($) {
     countries_flat["_"]="-select-";
-    $("h1").prepend(candidates.length);
+    $("h1").html(candidates.length +" candidates").hide();
 
     $.each(countries_flat, function (n) {
       parties_flat[n]= {};
@@ -267,8 +267,8 @@ function drawParty (ndx,selector) {
   var group   = dim.group().reduceSum(function(d) { return +1; });
 
   var chart = dc.heatMap(selector)
-    .width(40 * 15 + 80)
-    .height(45 * 5 + 40)
+    .width(35 * 15 + 80)
+    .height(40 * 5 + 40)
     .dimension(dim)
     .group(group)
     .keyAccessor(function(d) { 
@@ -308,6 +308,7 @@ function drawParty (ndx,selector) {
 
 {literal}
 <style>
+#binaries {width:60px;}
 #ep2014 .clear {clear:both}
 
 .heat-box {
@@ -318,18 +319,20 @@ function drawParty (ndx,selector) {
 {/literal}
 
 <div id="ep2014"> 
-<div class="group"></div> 
-<div class="country"></div> 
-<div class="no.party"></div> 
 <div class="partyheat"></div> 
+<div id="binaries" class ="dc-chart"> 
 <div class="email">Email</div> 
 <div class="website">Website</div> 
 <div class="facebook">Facebook</div> 
 <div class="twitter">Twitter</div> 
+</div>
+<div class="country"></div> 
+<div class="group"></div> 
+<div class="no.party"></div>
     <div> 
         <div class="dc-data-count"> 
             <span class="filter-count"></span> selected out of <span class="total-count"></span> candidates | <a 
-                href="javascript:dc.filterAll(); dc.renderAll();">Show all countries</a> 
+                href="javascript:dc.filterAll(); dc.renderAll();">Show all candidates</a> 
         </div> 
     </div> 
 <div class="clear">
