@@ -93,7 +93,7 @@ function draw () {
 
 
   var group = ndx.dimension(function(d) {
-    if (!d.party) return "";
+    if (!d.party || !parties_map[d.party] || !parties[parties_map[d.party]]) return "";
     return parties[parties_map[d.party]].custom_10;
   });
   var groupGroup   = group.group().reduceSum(function(d) {   return 1; });
