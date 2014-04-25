@@ -13,13 +13,12 @@ var party_field = "{$party_field}";
 
 var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,country" option_sort="organization_name ASC"}.values;
 
-var candidates = {crmAPI entity="Candidate" option_limit=1000}.values;
+var candidates = {$candidates};
 {literal}
 var parties_flat = {"_": {}}; 
 
 cj(function($) {
     countries_flat["_"]="-select-";
-    $("h1").prepend(candidates.length);
 
     $.each(countries_flat, function (n) {
       parties_flat[n]= {};

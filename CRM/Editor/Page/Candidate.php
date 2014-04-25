@@ -9,7 +9,22 @@ class CRM_Editor_Page_Candidate extends CRM_Core_Page {
 
     $datediff = strtotime("2014-05-22") - time();
     $days= floor($datediff/(60*60*24));
-    CRM_Utils_System::setTitle (" known candidates. $days days to go.");
+    $q = explode ("/",$_GET["q"]);
+    if (count($q)>2) {
+      $iso=strtoupper($q[2]);
+      if (strlen($iso) != 2) {
+        die ("not a country, url: /civicrm/candidate/fr");
+      }
+      $country=civicrm_api3("country","getsingle",array("iso_code" =>$iso));
+      $candidates = civicrm_api3("Candidate","get",array("country"=>$country["id"]));
+      $filter = "in ". $country["name"];
+    } else {
+      $filter = "";
+      $candidates = civicrm_api3("Candidate","get");
+    }
+    $this->assign("candidates", json_encode($candidates["values"]));
+    CRM_Utils_System::setTitle ($candidates["count"]." known candidates $filter. $days days to go.");
+    
     parent::run();
   }
 }
