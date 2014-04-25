@@ -175,7 +175,7 @@ function draw () {
       return d.value.count;
       })
 
-  .margins({top: 0, right: 0, bottom: 95, left: 30})
+  .margins({top: 0, right: 0, bottom: 95, left: 40})
   .x(d3.scale.ordinal())
   .xUnits(dc.units.ordinal)
   .brushOn(false)
@@ -215,8 +215,8 @@ function drawDate (ndx,selector) {
     }
   };
   chart
-    .width(600)
-    .height(180)
+    .width(666)
+    .height(140)
     .margins({top: 0, right: 0, bottom: 20, left: 40})
     .x(d3.time.scale().domain([new Date("2014-02-14"),new Date("2014-05-22")]))
     .brushOn(true)
@@ -342,15 +342,15 @@ function drawParty (ndx,selector) {
 
 <div id="ep2014"> 
 <div class="date"></div> 
-<div class="partyheat"></div> 
-<div id="binaries" class ="dc-chart"> 
-<div class="email">Email</div> 
-<div class="website">Website</div> 
-<div class="facebook">Facebook</div> 
-<div class="twitter">Twitter</div> 
-</div>
 <div class="country"></div> 
 <div class="group"></div> 
+<div class="partyheat"></div> 
+<div id="binaries" class ="dc-chart"> 
+  <div class="email">Email</div> 
+  <div class="website">Website</div> 
+  <div class="facebook">Facebook</div> 
+  <div class="twitter">Twitter</div> 
+</div>
 <div class="no.party"></div>
     <div> 
         <div class="dc-data-count"> 
