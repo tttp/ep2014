@@ -67,20 +67,9 @@ cj(function($) {
       parties_map[parties[n].id]=[n];
     });
 
-    $.each(candidates, function(n) {
-/*      if (candidates[n].party) {
-        if (candidates[n].country && parties_flat[candidates[n].country][candidates[n].party]) { 
-          candidates[n].party=parties_flat[candidates[n].country][candidates[n].party];
-        } else {
-          candidates[n].party="<b>party "+candidates[n].party+" missing</b>";
-        }
-      } else {
-        candidates[n].party="";
-      };
-      if (candidates[n].country) {
-        candidates[n].country = countries_flat[candidates[n].country];
-      }
-*/
+    var dateFormat = d3.time.format("%Y-%m-%d");
+    $.each(candidates, function(n,c) {
+       c.dateCreated = dateFormat.parse(c.created);
     });
 
     draw ();
@@ -107,6 +96,7 @@ function draw () {
   var groupParty   = party.group().reduceSum(function(d) {   return 1; });
   var pie_party = dc.pieChart(selector +  " .party").innerRadius(20).radius(70);
 
+  drawDate (ndx, " .date");
   drawCandidate (ndx, selector + " .list");
   drawParty (ndx,  selector + " .partyheat");
   drawBinary (ndx, selector + " .email","email");
@@ -193,7 +183,8 @@ function draw () {
   .yAxisLabel("nb Candidates")
   .dimension(country)
   .colorCalculator(function(d, i) { 
-        return color(d.value.count/seats[countries[d.value.id].iso_code]);
+     if (!d.value.id || !d.value.id in countries) return "#000"; 
+     return color(d.value.count/seats[countries[d.value.id].iso_code]);
    })
 
   .group(countryGroup);
@@ -205,6 +196,36 @@ function rotateBarChartLabels() {
   d3.selectAll(selector+ ' .country .axis.x text')
     .style("text-anchor", "end" )
     .attr("transform", function(d) { return "rotate(-90, -4, 9) "; });
+}
+
+function drawDate (ndx,selector) {
+  var chart = dc.lineChart(selector);
+
+  var dim = ndx.dimension(function(d) {
+      return d.dateCreated;
+      });
+
+  var _group = dim.group().reduceSum(function(d) {return 1;});
+
+  var group = {
+    all:function () {
+      var total = 0, g= [];
+      _group.all().forEach(function(d,i) {total += d.value; g.push({key:d.key,value:total})});
+      return g;
+    }
+  };
+  chart
+    .width(600)
+    .height(180)
+    .margins({top: 0, right: 0, bottom: 20, left: 40})
+    .x(d3.time.scale().domain([new Date("2014-02-14"),new Date("2014-05-22")]))
+    .brushOn(true)
+    .renderArea(true)
+    .elasticY(true)
+    .yAxisLabel("#candidates")
+    .yAxisLabel("#candidates")
+    .dimension(dim)
+    .group(group)
 }
 
 function drawBinary (ndx,selector,attribute) {
@@ -233,7 +254,7 @@ function drawCandidate (ndx,selector) {
               return parties[d.party].organization_name || "";
             return d.party;
         })
-        .size(3000)
+        .size(100)
         .columns([
             function (d) {
                 return d.first_name || "";
@@ -320,6 +341,7 @@ function drawParty (ndx,selector) {
 {/literal}
 
 <div id="ep2014"> 
+<div class="date"></div> 
 <div class="partyheat"></div> 
 <div id="binaries" class ="dc-chart"> 
 <div class="email">Email</div> 
