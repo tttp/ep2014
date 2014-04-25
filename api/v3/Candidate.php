@@ -130,7 +130,9 @@ function civicrm_api3_candidate_get ($params) {
     $sqlParam =  array(1 => array((int) $params["country"], 'Integer'));
   }
     $where .= " AND c.is_deleted = 0";
-
+  if (array_key_exists ("return",$params) && strpos($params["return"],"created") !== false) {
+    $select .= " , date(created_date) as created , date(modified_date) as modified "; 
+  }
 
   $sql = "SELECT $select FROM civicrm_contact as c $join WHERE $where";
   $dao = CRM_Core_DAO::executeQuery($sql, $sqlParam); 

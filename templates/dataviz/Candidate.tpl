@@ -17,7 +17,7 @@ var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=100
 var epgroups = {crmAPI entity="Contact" contact_sub_type="epparty" sequential=0 return="organization_name,nick_name,legal_name" option_limit=1000}.values;
 
 
-var candidates = {crmAPI entity="Candidate" option_limit=1000}.values;
+var candidates = {crmAPI entity="Candidate" return="created"}.values;
 
 {literal}
 var epgroups_color = {
@@ -116,7 +116,7 @@ function draw () {
 
   var bar_country = dc.barChart(selector + " .country");
   var country = ndx.dimension(function(d) {
-    if (typeof d.country == "undefined") return "";
+    if (typeof d.country == "undefined" || !(d.country in countries)) return "";
     return countries[d.country].name;
   });
   var countryGroup   = country.group().reduceSum(function(d) { return 1; });
