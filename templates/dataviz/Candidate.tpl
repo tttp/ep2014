@@ -222,8 +222,7 @@ function drawDate (ndx,selector) {
     .brushOn(true)
     .renderArea(true)
     .elasticY(true)
-    .yAxisLabel("#candidates")
-    .yAxisLabel("#candidates")
+    .yAxisLabel("nb Candidates")
     .dimension(dim)
     .group(group)
 }
@@ -341,6 +340,12 @@ function drawParty (ndx,selector) {
 {/literal}
 
 <div id="ep2014"> 
+    <div> 
+        <div class="dc-data-count"> 
+            <span class="filter-count"></span> selected out of <span class="total-count"></span> candidates | <a 
+                href="javascript:dc.filterAll(); dc.renderAll();">Show all candidates</a> 
+        </div> 
+    </div> 
 <div class="date"></div> 
 <div class="country"></div> 
 <div class="group"></div> 
@@ -352,12 +357,6 @@ function drawParty (ndx,selector) {
   <div class="twitter">Twitter</div> 
 </div>
 <div class="no.party"></div>
-    <div> 
-        <div class="dc-data-count"> 
-            <span class="filter-count"></span> selected out of <span class="total-count"></span> candidates | <a 
-                href="javascript:dc.filterAll(); dc.renderAll();">Show all candidates</a> 
-        </div> 
-    </div> 
 <div class="clear">
     <table class="table table-hover list">
         <thead>
