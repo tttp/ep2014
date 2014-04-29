@@ -127,7 +127,7 @@ function draw () {
     return (parties_flat[d.key].nick_name || parties_flat[d.key].organization_name);})
   .title(function (d) { 
     if (!d.key) return "xx";
-    return parties_flat[d.key].organization_name;})
+    return parties_flat[d.key].organization_name + ":" + d.value;})
   .colors(d3.scale.category20())
   .group(groupParty)
   .renderlet(function (chart) {
@@ -151,7 +151,8 @@ function draw () {
   })
   .title(function (d) { 
     if (!d.key) return "??";
-    return epgroups[d.key].legal_name || epgroups[d.key].organization_name;
+    var t= epgroups[d.key].legal_name || epgroups[d.key].organization_name ;
+    return t + ":"+d.value;
   })
 
   .renderlet(function (chart) {
@@ -166,10 +167,10 @@ function draw () {
     if (!d.key) return "?";
     return countries[d.key].iso_code;
   })
+*/
   .title(function (d) { 
-    if (!d.key) return "(missing)";
-    return countries[d.key].name;
-  })*/
+    return d.key + ":" +d.value.count +" candidates";
+  })
   .valueAccessor (
       function(d) {
       return d.value.count;
