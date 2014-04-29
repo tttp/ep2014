@@ -169,7 +169,9 @@ function draw () {
   })
 */
   .title(function (d) { 
-    return d.key + ":" +d.value.count +" candidates";
+d
+    return d.key + ":" +d.value.count +" candidates for " + seats[countries[d.value.id].iso_code] + " seats";
+
   })
   .valueAccessor (
       function(d) {
