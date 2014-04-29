@@ -252,6 +252,7 @@ function drawCandidate (ndx,selector) {
   dc.dataTable(selector)
         .dimension(party)
         .group(function (d) {
+           return d.added;
 //            return parties[parties_map[d.party]].custom_10;
             if (!d.party || !parties[d.party]) return "";
               return parties[d.party].organization_name || "";
@@ -259,9 +260,6 @@ function drawCandidate (ndx,selector) {
         })
         .size(100)
         .columns([
-            function (d) {
-                return d.added || "";
-            },
             function (d) {
                 return d.first_name || "";
             },
@@ -336,8 +334,8 @@ function drawParty (ndx,selector) {
 
 {literal}
 <style>
+tr.dc-table-group {background:lightgrey;}
 #binaries {display:none}
-#binaries {width:60px;}
 #ep2014 .clear {clear:both}
 
 .heat-box {
@@ -369,7 +367,6 @@ function drawParty (ndx,selector) {
     <table class="table table-hover list">
         <thead>
         <tr class="header">
-            <th>date</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Party</th>
