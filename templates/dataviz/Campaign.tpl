@@ -1,3 +1,5 @@
+{crmAPI var='group' entity='Group' action='getsingle' id=$id}
+<h2>Signatures in {$group.title}</h2>
 <script>
 {assign var="epgroup_field" value="group"}
 {assign var="country_field" value="custom_3"}
