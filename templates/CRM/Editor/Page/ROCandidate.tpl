@@ -84,6 +84,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     "bPaginate":false,
     "aaData": candidates,
     aoColumnDefs: [
+        { "aTargets":[0],"sTitle": "#", mDataProp: "position",sClass:""},
         { "aTargets":[0],"sTitle": "First Name", mDataProp: "first_name",sClass:""},
         { "aTargets":[1],"sTitle": "Last Name", mDataProp: "last_name",sClass: ""},
         { "aTargets":[2],"sTitle": "country", mDataProp:"country", "sClass": "" },

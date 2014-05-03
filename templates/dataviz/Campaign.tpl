@@ -208,10 +208,10 @@ function rotateBarChartLabels() {
 function twitterize (selector) {
   jQuery ( "body" ).on( "click", selector, function(event) {
     event.preventDefault();
-    var t= this.href.replace("https://twitter.com/","@ ")
-    var msg = twitterMsg.replace("@ ",t); 
+    var t= this.href.replace("https://twitter.com/","@")
+    var msg = twitterMsg.replace("@ ",t+" "); 
     var url = "http://twitter.com/home/?status=";
-    window.open(url+msg, "twitter");
+    window.open(url+encodeURIComponent(msg), "twitter");
     return false;
 });
 }
