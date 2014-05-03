@@ -1,6 +1,8 @@
 {crmAPI var='group' entity='Group' action='getsingle' id=$id}
 <h2>Signatures in {$group.title}</h2>
 <script>
+var twitterMsg = "{$group.description}" || "Thank you @ for signing the pledge";
+ 
 {assign var="epgroup_field" value="group"}
 {assign var="country_field" value="custom_3"}
 {assign var="party_field" value="custom_5"}
@@ -203,6 +205,17 @@ function rotateBarChartLabels() {
     .attr("transform", function(d) { return "rotate(-90, -4, 9) "; });
 }
 
+function twitterize (selector) {
+  jQuery ( "body" ).on( "click", selector, function(event) {
+    event.preventDefault();
+    var t= this.href.replace("https://twitter.com/","@ ")
+    var msg = twitterMsg.replace("@ ",t); 
+    var url = "http://twitter.com/home/?status=";
+    window.open(url+msg, "twitter");
+    return false;
+});
+}
+
 function drawDate (ndx,selector) {
   var chart = dc.lineChart(selector);
 
@@ -266,6 +279,14 @@ function drawCandidate (ndx,selector) {
         .size(100)
         .columns([
             function (d) {
+                if (!d.twitter)
+                  return "";
+                d.twitter=d.twitter.replace("www.","").replace(/http:\/\/|https:\/\/(.*)/i,"$1"); 
+                d.twitter=d.twitter.replace(/twitter.com\/?(.*)/i,"$1"); 
+                d.twitter="https://twitter.com/"+d.twitter; 
+                return "<a href='"+d.twitter+"' class='twitter'></a>";
+            },
+            function (d) {
                 return d.first_name || "";
             },
             function (d) {
@@ -288,6 +309,7 @@ function drawCandidate (ndx,selector) {
         .sortBy(function (d) {
           return d.dateCreated;
         })
+  twitterize("a.twitter");
 } 
 
 function drawParty (ndx,selector) {
@@ -347,6 +369,15 @@ tr.dc-table-group {background:lightgrey;}
   stroke: #E6E6E6;
   stroke-width: 2px;
 }
+
+a.twitter {
+    background:url("https://twitter.com/favicon.ico") no-repeat;
+    display:block;
+    height: 16px;
+    left: 2px;
+    top: 50%;
+    width: 16px;
+}
 </style>
 {/literal}
 
@@ -372,6 +403,7 @@ tr.dc-table-group {background:lightgrey;}
     <table class="table table-hover list">
         <thead>
         <tr class="header">
+            <th></th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Party</th>
