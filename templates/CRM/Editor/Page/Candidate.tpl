@@ -81,7 +81,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     "aaData": candidates,
     aoColumnDefs: [
       {"aTargets":[0],sTitle:"",mData:"id",mRender:function (data,type,full) {return "<a class='ui-icon ui-icon-person' href='"+CRM.url('civicrm/contact/view', {"reset": 1, "cid":data})+"'></a><a class='ui-icon ui-icon-search' title='search on google'></a>";}},
-        { "aTargets":[0],"sTitle": "#", mDataProp: "position",sClass:"editable"},
+        { "aTargets":[0],"sTitle": "#", mDataProp: "position",sClass:""},
         { "aTargets":[1],"sTitle": "First Name", mDataProp: "first_name",sClass: "editable"},
         { "aTargets":[2],"sTitle": "Last Name", mDataProp: "last_name",sClass: "editable"},
         { "aTargets":[3],"sTitle": "country", mDataProp:"country", "sClass": "country" },
