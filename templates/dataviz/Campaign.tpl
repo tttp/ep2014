@@ -276,7 +276,7 @@ function drawCandidate (ndx,selector) {
               return parties[d.party].organization_name || "";
             return d.party;
         })
-        .size(100)
+        .size(2000)
         .columns([
             function (d) {
                 if (!d.twitter)
