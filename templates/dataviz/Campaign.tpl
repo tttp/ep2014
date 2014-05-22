@@ -290,7 +290,7 @@ function drawCandidate (ndx,selector) {
                 return d.first_name || "";
             },
             function (d) {
-                return d.last_name || "";
+                return "<a href='/civicrm/contact/view?cid="+d.id+"'>" + d.last_name+"</a>";
             },
             function (d) {
                 if (!d.party || !parties_map[d.party]) return "?";
