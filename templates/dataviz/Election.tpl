@@ -105,9 +105,11 @@ function draw () {
   var groupParty   = party.group().reduceSum(function(d) {   return 1; });
   var pie_party = dc.pieChart(selector +  " .party").innerRadius(20).radius(70);
 
-  drawDate (ndx, " .date");
+//  drawDate (ndx, " .date");
   drawCandidate (ndx, selector + " .list");
-  drawParty (ndx,  selector + " .partyheat");
+  drawConstituency (ndx)
+//  drawParty (ndx,  selector + " .partyheat");
+  drawBinary (ndx, selector + " .elected","ep2014");
   drawBinary (ndx, selector + " .email","email");
   drawBinary (ndx, selector + " .website","website");
   drawBinary (ndx, selector + " .facebook","facebook");
@@ -257,6 +259,23 @@ function drawDate (ndx,selector) {
     .group(group)
 }
 
+function drawConstituency (ndx) {
+  var selector =".constituency";
+  var dim = ndx.dimension(function(d) {
+    if (typeof d.constituency == "undefined" || !d.constituency)
+      return "";
+    return d.constituency;
+  });
+  var group   = dim.group().reduceSum(function(d) {   return 1; });
+  var pie = dc.pieChart(selector).innerRadius(3).radius(60)
+  .width(200)
+  .height(200)
+  .dimension(dim)
+  .renderLabel(false)
+  .colors(d3.scale.ordinal().range(['#3a6033','#b00000']))
+  .group(group);
+}
+
 function drawBinary (ndx,selector,attribute) {
   var dim = ndx.dimension(function(d) {
     if (typeof d[attribute] == "undefined" || !d[attribute])
@@ -366,6 +385,11 @@ function drawParty (ndx,selector) {
 {literal}
 <style>
 
+.dc-chart {position:relative;}
+.dc-chart svg {z-index:100;}
+.dc-chart h2 {position:absolute;font-size:18px;color:grey;text-align:center;width:100%}
+
+td._0 {cursor:pointer;}
 
 #binaries {width:60px;}
 #ep2014 .clear {clear:both}
@@ -387,14 +411,22 @@ function drawParty (ndx,selector) {
 <div class="date"></div> 
 <div class="country"></div> 
 <div class="group"></div> 
-<div class="party"></div> 
+<div class="party"><h2>Nat Party</h2></div> 
+<div class="constituency"><h2>Constituency<h2></div> 
+<div id="binaries" class ="dc-chart"> 
+  <div class="elected">Elected</div> 
+  <!--div class="email">Email</div> 
+  <div class="website">Website</div> 
+  <div class="facebook">Facebook</div> 
+  <div class="twitter">Twitter</div--> 
+</div>
 <div class="clear">
     <table class="table table-hover list">
         <thead>
         <tr class="header">
             <th>Won</th>
             <th>Name</th>
-            <th>Position</th>
+            <th>Priority</th>
             <th>Party</th>
             <th>Constituency</th>
             <th>Country</th>
