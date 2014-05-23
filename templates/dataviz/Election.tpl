@@ -272,7 +272,7 @@ function drawConstituency (ndx) {
   .height(200)
   .dimension(dim)
   .renderLabel(false)
-  .colors(d3.scale.ordinal().range(['#3a6033','#b00000']))
+  .colors(d3.scale.category20())
   .group(group);
 }
 
