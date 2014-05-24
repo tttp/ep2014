@@ -18,6 +18,8 @@ var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=100
 
 var epgroups = {crmAPI entity="Contact" contact_sub_type="epparty" sequential=0 return="organization_name,nick_name,legal_name" option_limit=1000}.values;
 
+var constituencies = {crmAPI entity="Contact" contact_sub_type="constituency" sequential=0 return="organization_name,nick_name,legal_name" option_limit=1000}.values;
+
 
 var candidates = {crmAPI entity="Candidate" return="created"}.values;
 
@@ -264,7 +266,9 @@ function drawConstituency (ndx) {
   var dim = ndx.dimension(function(d) {
     if (typeof d.constituency == "undefined" || !d.constituency)
       return "";
-    return d.constituency;
+    if (!constituencies[d.constituency])
+      return d.constituency;
+    return constituencies[d.constituency].organization_name;
   });
   var group   = dim.group().reduceSum(function(d) {   return 1; });
   var pie = dc.pieChart(selector).innerRadius(3).radius(60)
@@ -318,7 +322,11 @@ function drawCandidate (ndx,selector) {
                 return parties[parties_map[d.party]].organization_name || "??";
             },
             function (d) {
-                return d.constituency || "";
+              if (typeof d.constituency == "undefined" || !d.constituency)
+                return "";
+              if (!constituencies[d.constituency])
+                return d.constituency;
+              return constituencies[d.constituency].organization_name;
             },
             function (d) {
                 if (!d.country || !countries[d.country]) return "?";
