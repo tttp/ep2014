@@ -78,10 +78,13 @@ cj(function($) {
 
     draw ();
     $("body").on("click","td._0", function () {
-      if ($(this).find(".fa").hasClass("fa-thumbs-o-down")) {
-        $(this).find(".fa").removeClass("fa-thumbs-o-down").addClass("fa-thumbs-o-up");
+      $thumb= $(this).find(".fa");
+      if ($thumb.hasClass("fa-thumbs-o-down")) {
+        $thumb.removeClass("fa-thumbs-o-down").addClass("fa-thumbs-o-up");
+        CRM.api("candidate","create",{"elected":"1",id:$thumb.data("id")});
       } else {
-        $(this).find(".fa").removeClass("fa-thumbs-o-up").addClass("fa-thumbs-o-down");
+        $thumb.removeClass("fa-thumbs-o-up").addClass("fa-thumbs-o-down");
+        CRM.api("candidate","create",{"elected":"",id:$thumb.data("id")});
       }
     });
   
@@ -111,11 +114,12 @@ function draw () {
   drawCandidate (ndx, selector + " .list");
   drawConstituency (ndx)
 //  drawParty (ndx,  selector + " .partyheat");
-  drawBinary (ndx, selector + " .elected","ep2014");
-  drawBinary (ndx, selector + " .email","email");
-  drawBinary (ndx, selector + " .website","website");
-  drawBinary (ndx, selector + " .facebook","facebook");
-  drawBinary (ndx, selector + " .twitter","twitter");
+  drawBinary (ndx, selector + " .elected","elected");
+  drawBinary (ndx, selector + " .priority","priority");
+//  drawBinary (ndx, selector + " .email","email");
+//  drawBinary (ndx, selector + " .website","website");
+//  drawBinary (ndx, selector + " .facebook","facebook");
+//  drawBinary (ndx, selector + " .twitter","twitter");
 
   var bar_country = dc.barChart(selector + " .country");
   var country = ndx.dimension(function(d) {
@@ -283,12 +287,13 @@ function drawConstituency (ndx) {
 function drawBinary (ndx,selector,attribute) {
   var dim = ndx.dimension(function(d) {
     if (typeof d[attribute] == "undefined" || !d[attribute])
-      return "Missing";
-    return "Complete";
+      return "";
+    return attribute;
   });
   var group   = dim.group().reduceSum(function(d) {   return 1; });
   var pie = dc.pieChart(selector).innerRadius(3).radius(25)
   .width(50)
+.minAngleForLabel(0)
   .height(50)
   .dimension(dim)
   .renderLabel(false)
@@ -306,16 +311,19 @@ function drawCandidate (ndx,selector) {
               return parties[d.party].organization_name || "";
             return d.party;
         })
-        .size(100)
+        .size(10000)
         .columns([
-            function (d) {
-                return d.elected|| '<i class="fa fa-thumbs-o-down" title="not elected"></i>';
+            function (d) { 
+              var dir ="down";
+              if (d.elected)
+                dir ="up";
+              return '<i class="fa fa-thumbs-o-'+dir+'" title="click to change the elected status" data-id="'+d.id+'"></i>';
             },
             function (d) {
-                return "<a href='/civicrm/contact/view?cid="+d.id+"'>" + d.first_name +" "+ d.last_name+"</a>";
-            },
-            function (d) {
-                return d.position || "";
+              var name = d.first_name +" "+ d.last_name;
+              if (d.priority)
+                var name ="<b>"+name+"</b>";
+              return "<a href='/civicrm/contact/view?cid="+d.id+"'>" + name+"</a>";
             },
             function (d) {
                 if (!d.party || !parties_map[d.party]) return "?";
@@ -423,6 +431,7 @@ td._0 {cursor:pointer;}
 <div class="constituency"><h2>Constituency<h2></div> 
 <div id="binaries" class ="dc-chart"> 
   <div class="elected">Elected</div> 
+  <div class="priority">Priority</div> 
   <!--div class="email">Email</div> 
   <div class="website">Website</div> 
   <div class="facebook">Facebook</div> 
@@ -434,7 +443,6 @@ td._0 {cursor:pointer;}
         <tr class="header">
             <th>Won</th>
             <th>Name</th>
-            <th>Priority</th>
             <th>Party</th>
             <th>Constituency</th>
             <th>Country</th>
