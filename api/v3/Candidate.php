@@ -119,6 +119,7 @@ function civicrm_api3_candidate_get ($params) {
   $join .= "LEFT JOIN civicrm_website as twitter ON twitter.contact_id=c.id AND twitter.website_type_id=4 ";
   if (array_key_exists ("group",$params)) {
     $select .= ",date(hist.date) as added ";
+    $join .= "join civicrm_group_contact as g on g.group_id=%1 and c.id=g.contact_id and status = 'Added' ";
     $join .= "join (select max(id) as hist_id, contact_id,date,status from civicrm_subscription_history where group_id=%1 group by contact_id) hist on hist.contact_id=c.id";
     $sqlParam =  array(1 => array((int) $params["group"], 'Integer'));
     $where = "contact_sub_type like '%candidate%' and hist.status='Added'";
