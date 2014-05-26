@@ -21,7 +21,7 @@ var epgroups = {crmAPI entity="Contact" contact_sub_type="epparty" sequential=0 
 var constituencies = {crmAPI entity="Contact" contact_sub_type="constituency" sequential=0 return="organization_name,nick_name,legal_name" option_limit=1000}.values;
 
 
-var candidates = {crmAPI entity="Candidate" return="created"}.values;
+var candidates = {crmAPI entity="Candidate"  return="created"}.values;
 
 {literal}
 var epgroups_color = {
