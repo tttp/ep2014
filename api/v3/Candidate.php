@@ -128,6 +128,9 @@ function civicrm_api3_candidate_get ($params) {
     $params["group"] = null;
     $where = "contact_sub_type like '%candidate%'";
   }
+  if (array_key_exists ("elected",$params) {
+     $where. = " AND ep2014_30=1";
+  }
   if (array_key_exists ("country",$params)) {
     $where .= " AND civicrm_value_ep_1.country_3 = %1";
     $sqlParam =  array(1 => array((int) $params["country"], 'Integer'));
