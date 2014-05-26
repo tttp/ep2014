@@ -85,5 +85,6 @@ function editor_civicrm_alterAPIPermissions($entity, $action, &$params, &$permis
     $permissions['country']['get'] = array('access CiviCRM');
     $permissions['candidate']['get'] = array('access CiviCRM');
     $permissions['candidate']['create'] = array('add contacts');
+    $permissions['candidate']['update'] = array('add contacts');
     $permissions['candidate']['setvalue'] = array('add contacts');
 }

@@ -135,16 +135,20 @@ function draw () {
 
  
  pie_party
-  .width(200)
-  .height(200)
+  .width(140)
+  .height(140)
   .dimension(party)
   .label(function (d) { 
-     if (!d.data || !d.data.key || !parties_map[d.data.key]) return "?";
-       return parties[parties_map[d.data.key]].organization_name || "??";
+     if (typeof(d.key) == 'undefined') return ".";
+     if (typeof(parties_map[d.key]) == 'undefined') return "?";
+     if (typeof(parties[parties_map[d.key]]) == 'undefined') return "??";
+       return parties[parties_map[d.key]].organization_name || "??";
   })
   .title(function (d) { 
-     if (!d.data || !d.data.key || !parties_map[d.data.key]) return "?";
-       return parties[parties_map[d.data.key]].organization_name || "??";
+     if (typeof(d.key) == 'undefined') return ".";
+     if (typeof(parties_map[d.key]) == 'undefined') return "?";
+     if (typeof(parties[parties_map[d.key]]) == 'undefined') return "??";
+       return parties[parties_map[d.key]].organization_name + ":" +d.value;
   })
   .colors(d3.scale.category20())
   .group(groupParty)
