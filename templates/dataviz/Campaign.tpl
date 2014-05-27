@@ -101,12 +101,9 @@ function draw () {
   var pie_party = dc.pieChart(selector +  " .party").innerRadius(20).radius(70);
 
   drawDate (ndx, " .date");
+  drawBinary (ndx, " .elected","elected");
   drawCandidate (ndx, selector + " .list");
 //  drawParty (ndx,  selector + " .partyheat");
-//  drawBinary (ndx, selector + " .email","email");
-//  drawBinary (ndx, selector + " .website","website");
-//  drawBinary (ndx, selector + " .facebook","facebook");
-//  drawBinary (ndx, selector + " .twitter","twitter");
 
   var bar_country = dc.barChart(selector + " .country");
   var country = ndx.dimension(function(d) {
@@ -252,18 +249,20 @@ console.log(from);
 function drawBinary (ndx,selector,attribute) {
   var dim = ndx.dimension(function(d) {
     if (typeof d[attribute] == "undefined" || !d[attribute])
-      return "Missing";
-    return "Complete";
+      return "";
+    return attribute;
   });
   var group   = dim.group().reduceSum(function(d) {   return 1; });
   var pie = dc.pieChart(selector).innerRadius(3).radius(25)
   .width(50)
+.minAngleForLabel(0)
   .height(50)
   .dimension(dim)
   .renderLabel(false)
   .colors(d3.scale.ordinal().range(['#3a6033','#b00000']))
   .group(group);
 }
+
 
 function drawCandidate (ndx,selector) {
 
@@ -362,7 +361,6 @@ function drawParty (ndx,selector) {
 {literal}
 <style>
 tr.dc-table-group {background:lightgrey;}
-#binaries {display:none}
 #ep2014 .clear {clear:both}
 
 .heat-box {
@@ -393,10 +391,7 @@ a.twitter {
 <div class="group"></div> 
 <div class="partyheat"></div> 
 <div id="binaries" class ="dc-chart"> 
-  <div class="email">Email</div> 
-  <div class="website">Website</div> 
-  <div class="facebook">Facebook</div> 
-  <div class="twitter">Twitter</div> 
+  <div class="elected">Elected</div> 
 </div>
 <div class="no.party"></div>
 <div class="clear">
