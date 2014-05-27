@@ -19,6 +19,12 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/mep</path>
+    <page_callback>CRM_Editor_Page_Mep</page_callback>
+    <title>Candidates</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
     <path>civicrm/candidate/view</path>
     <page_callback>CRM_Editor_Page_ROCandidate</page_callback>
     <title>View Candidates</title>

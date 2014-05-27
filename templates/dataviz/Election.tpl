@@ -45,12 +45,21 @@ var epgroups_color = {
 "None":"pink"
 };
 
+countryID = function (iso) {
+  for (a in countries) {
+    if (countries[a].iso_code == iso) {
+      return countries[a].name;
+    }
+  }
+  return iso; //didn't find the country             
+};
+
 var seats= {"DE":"96","FR":"74","GB":"73","IT":"73","ES":"54","PL":"51","RO":"32","NL":"26","GR":"21","BE":"21","PT":"21","CZ":"21","HU":"21","SE":"20","AT":"18","BG":"17","DK":"13","SK":"13","FI":"13","IE":"11","HR":"11","LT":"11","SL":"8","LV":"8","SI":"7","EE":"6","CY":"6", "LU":"6","MT":"6"};
 
   var color = d3.scale.linear()
     .clamp(true)
-    .domain([0, 0.9, 1, 10])
-    .range(["#b00000","#f4d8d8","#d0e5cc","#3a6033"])
+    .domain([0, 0.9, 1, 1.1, 10])
+    .range(["#b00000","#f4d8d8","#0ef609","#d0e5cc","#3a6033"])
     .interpolate(d3.interpolateHcl);
 
 var parties_flat = {"_": {}}; 
@@ -124,7 +133,7 @@ function draw () {
   var bar_country = dc.barChart(selector + " .country");
   var country = ndx.dimension(function(d) {
     if (typeof d.country == "undefined" || !(d.country in countries)) return "";
-    return countries[d.country].name;
+    return countries[d.country].iso_code;
   });
   var countryGroup   = country.group().reduceSum(function(d) { return 1; });
   var countryGroup   = country.group().reduce(
@@ -138,17 +147,11 @@ function draw () {
   .width(140)
   .height(140)
   .dimension(party)
-  .label(function (d) { 
-     if (typeof(d.key) == 'undefined') return ".";
-     if (typeof(parties_map[d.key]) == 'undefined') return "?";
-     if (typeof(parties[parties_map[d.key]]) == 'undefined') return "??";
-       return parties[parties_map[d.key]].organization_name || "??";
-  })
   .title(function (d) { 
      if (typeof(d.key) == 'undefined') return ".";
      if (typeof(parties_map[d.key]) == 'undefined') return "?";
      if (typeof(parties[parties_map[d.key]]) == 'undefined') return "??";
-       return parties[parties_map[d.key]].organization_name + ":" +d.value;
+       return parties[parties_map[countryID(d.key)]].organization_name + ":" +d.value;
   })
   .colors(d3.scale.category20())
   .group(groupParty)
@@ -204,14 +207,11 @@ function draw () {
   .height(200)
   .outerPadding(0)
   .gap(1)
-/*  .label(function (d) { 
-    if (!d.key) return "?";
-    return countries[d.key].iso_code;
-  })
   .title(function (d) { 
     if (!d.key) return "(missing)";
-    return countries[d.key].name;
-  })*/
+    if (!countries[d.key]) return "(missing)";
+    return countries[d.key].name + " "+ d.values + " seats: "+ seats[countryID(d.key)];
+  })
   .valueAccessor (
       function(d) {
       return d.value.count;
