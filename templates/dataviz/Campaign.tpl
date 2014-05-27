@@ -103,7 +103,6 @@ function draw () {
   drawDate (ndx, " .date");
   drawBinary (ndx, " .elected","elected");
   drawCandidate (ndx, selector + " .list");
-//  drawParty (ndx,  selector + " .partyheat");
 
   var bar_country = dc.barChart(selector + " .country");
   var country = ndx.dimension(function(d) {
@@ -249,14 +248,14 @@ console.log(from);
 function drawBinary (ndx,selector,attribute) {
   var dim = ndx.dimension(function(d) {
     if (typeof d[attribute] == "undefined" || !d[attribute])
-      return "";
-    return attribute;
+      return "not elected";
+    return "MEP";
   });
   var group   = dim.group().reduceSum(function(d) {   return 1; });
   var pie = dc.pieChart(selector).innerRadius(3).radius(25)
-  .width(50)
+  .width(100)
 .minAngleForLabel(0)
-  .height(50)
+  .height(100)
   .dimension(dim)
   .renderLabel(false)
   .colors(d3.scale.ordinal().range(['#3a6033','#b00000']))
@@ -362,7 +361,8 @@ function drawParty (ndx,selector) {
 <style>
 tr.dc-table-group {background:lightgrey;}
 #ep2014 .clear {clear:both}
-
+.dc-chart h2 {font-size:15px;color:grey;position:absolute;text-align:center;width:100%}
+.elected {float:left;width:100px;position:absolute; left:500px;top:45px;}
 .heat-box {
   stroke: #E6E6E6;
   stroke-width: 2px;
@@ -386,12 +386,11 @@ a.twitter {
                 href="javascript:dc.filterAll(); dc.renderAll();">Show all candidates</a> 
         </div> 
     </div> 
-<div class="date"></div> 
+  <div class="elected"><h2>Elected</h2></div> 
 <div class="country"></div> 
 <div class="group"></div> 
-<div class="partyheat"></div> 
+<div class="date"></div> 
 <div id="binaries" class ="dc-chart"> 
-  <div class="elected">Elected</div> 
 </div>
 <div class="no.party"></div>
 <div class="clear">
