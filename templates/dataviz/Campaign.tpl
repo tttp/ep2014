@@ -268,7 +268,9 @@ function drawCandidate (ndx,selector) {
   dc.dataTable(selector)
         .dimension(party)
         .group(function (d) {
-           return d.added;
+           if (!d.country || !countries[d.country]) return "?";
+           return countries[d.country].name;
+//           return d.added;
 //            return parties[parties_map[d.party]].custom_10;
             if (!d.party || !parties[d.party]) return "";
               return parties[d.party].organization_name || "";
@@ -303,9 +305,8 @@ function drawCandidate (ndx,selector) {
                 return epgroups[parties[parties_map[d.party]].custom_10].organization_name || "??";
             }
         ])
-        .order(d3.descending)
         .sortBy(function (d) {
-          return d.dateCreated;
+          return d.last_name;
         })
   twitterize("a.twitter");
 } 
