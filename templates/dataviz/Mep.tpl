@@ -4,7 +4,7 @@
 {assign var="party_field" value="custom_5"}
 {assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
 
-var selector = "#ep2014";
+var selector = "#ep2019";
 var epgroup_field = "{$epgroup_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country" sequential=0}.values;
@@ -330,7 +330,7 @@ function drawParty (ndx,selector) {
 {literal}
 <style>
 #binaries {width:60px;}
-#ep2014 .clear {clear:both}
+#ep2019 .clear {clear:both}
 
 .heat-box {
   stroke: #E6E6E6;
@@ -339,7 +339,7 @@ function drawParty (ndx,selector) {
 </style>
 {/literal}
 
-<div id="ep2014"> 
+<div id="ep2019"> 
     <div> 
         <div class="dc-data-count"> 
             <span class="filter-count"></span> selected out of <span class="total-count"></span> candidates | <a 

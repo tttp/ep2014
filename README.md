@@ -1,4 +1,4 @@
-CiviCRM extension developped for ep2014
+CiviCRM extension developped for ep2019
 
 It contains two examples of datagrid used with jeditable
 

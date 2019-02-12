@@ -71,7 +71,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     var oTable = $('#contacts').dataTable( {
     "sDom": "<'ui-widget-header'<'span6'T><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "oTableTools": {
-      "sSwfPath": "/extensions/ep2014/TableTools/swf/copy_csv_xls.swf",
+      "sSwfPath": "/extensions/ep2019/TableTools/swf/copy_csv_xls.swf",
     },
     aaSorting:[],
     bSortClasses: false,

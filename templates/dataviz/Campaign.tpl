@@ -1,14 +1,15 @@
 {crmAPI var='group' entity='Group' action='getsingle' id=$id}
 <h2>Signatures in {$group.title}</h2>
+<input id="twitter" value="{$group.description}" />
 <script>
-var twitterMsg = "{$group.description}" || "Thank you @ for signing the pledge";
+var twitterMsg = jQuery("#twitter").val() || "Thank you @ for signing the pledge";
  
 {assign var="epgroup_field" value="group"}
 {assign var="country_field" value="custom_3"}
 {assign var="party_field" value="custom_5"}
 {assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
 
-var selector = "#ep2014";
+var selector = "#ep2019";
 var epgroup_field = "{$epgroup_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country" sequential=0}.values;
@@ -361,7 +362,7 @@ function drawParty (ndx,selector) {
 {literal}
 <style>
 tr.dc-table-group {background:lightgrey;}
-#ep2014 .clear {clear:both}
+#ep2019 .clear {clear:both}
 .dc-chart h2 {font-size:15px;color:grey;position:absolute;text-align:center;width:100%}
 .elected {float:left;width:100px;position:absolute; left:500px;top:45px;}
 .heat-box {
@@ -380,7 +381,7 @@ a.twitter {
 </style>
 {/literal}
 
-<div id="ep2014"> 
+<div id="ep2019"> 
     <div> 
         <div class="dc-data-count"> 
             <span class="filter-count"></span> selected out of <span class="total-count"></span> candidates | <a 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<extension key="org.ep2014.editor" type="module">
+<extension key="org.ep2019.editor" type="module">
   <file>editor</file>
-  <name>EP2014 editor</name>
+  <name>EP2019 editor</name>
   <description>Batch update/add candidates</description>
   <license>aGPL3</license>
   <maintainer>

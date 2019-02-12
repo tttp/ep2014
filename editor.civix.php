@@ -169,7 +169,7 @@ function _editor_civix_civicrm_managed(&$entities) {
     $es = include $file;
     foreach ($es as $e) {
       if (empty($e['module'])) {
-        $e['module'] = 'org.ep2014.editor';
+        $e['module'] = 'org.ep2019.editor';
       }
       $entities[] = $e;
     }
@@ -198,7 +198,7 @@ function _editor_civix_civicrm_caseTypes(&$caseTypes) {
       // throw new CRM_Core_Exception($errorMessage);
     }
     $caseTypes[$name] = array(
-      'module' => 'org.ep2014.editor',
+      'module' => 'org.ep2019.editor',
       'name' => $name,
       'file' => $file,
     );
