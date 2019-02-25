@@ -1,28 +1,41 @@
 <h3>Parties</h3>
 
 <script>
-{assign var="epgroup_field" value="custom_9"}
-{assign var="euparty_field" value="custom_10"}
-{assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field,$euparty_field"}
+{assign var="epgroup_field" value="custom_1"}
+{assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
 
 var epgroup_field = "{$epgroup_field}";
-var euparty_field = "{$euparty_field}";
+var euparty_field = epgroup_field;//"{$euparty_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country"}.values;
 
-var groups = {crmAPI entity="Contact" contact_sub_type="epgroup" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
-var euparties = {crmAPI entity="Contact" contact_sub_type="epparty" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
+var groups = {crmAPI entity="Contact" contact_sub_type="eugroup" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
+var euparties = groups;//{crmAPI entity="Contact" contact_sub_type="euparty" option_limit=1000 return="organization_name,nick_name,legal_name" option_sort="organization_name ASC"}.values;
 
 var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return=$return_party option_sort="organization_name ASC"}.values;
 {literal}
 var groups_flat = {}; 
 var euparties_flat = {}; 
 
-cj(function($) {
+CRM.$(function($) {
+
     $.each(groups, function(n) {
         groups_flat[groups[n].id]=groups[n].organization_name;
     });
     groups_flat[0]="-select-";
+    euparties.forEach(function(d){
+      d.contact_id = parseInt(d.contact_id,10);
+      d.id = parseInt(d.id,10);
+      d.country_id = parseInt(d.country_id,10);
+    });
+
+    parties.forEach(function(d){
+      d.contact_id = parseInt(d.contact_id,10);
+      d.id = parseInt(d.id,10);
+      d.country_id = parseInt(d.country_id,10);
+      d.address_id = parseInt(d.address_id,10);
+      d.custom_1 = parseInt(d.custom_1,10);
+    });
     $.each(euparties, function(n) {
         euparties_flat[euparties[n].id]=euparties[n].organization_name;
     });
@@ -30,11 +43,17 @@ cj(function($) {
 
     countries_flat[0]="-select-";
 
-    $.each(parties, function(n,p) {
+/*    $.each(parties, function(n,p) {
+      if (parties[n][epgroup_field]){
+        parties[n][epgroup_field] = parseInt(parties[n][epgroup_field],10);
+      }
+
       if (parties[n][epgroup_field]) {
+        
+//typeof parties[n][epgroup_field] == "number")  {
         if (groups_flat[parties[n][epgroup_field]]) {
           parties[n][epgroup_field]=groups_flat[parties[n][epgroup_field]];
-        } else {
+        } else if (typeof parties[n][epgroup_field] == "number") {
           parties[n][epgroup_field]= "<b>missing "+parties[n][epgroup_field]+"</b>";
         }
       } else {
@@ -50,7 +69,7 @@ cj(function($) {
         parties[n][euparty_field]="";
       };
     });
-
+*/
     var oTable = $('#contacts').dataTable( {
     aaSorting:[],
 bSortClasses: false,
@@ -59,13 +78,13 @@ bSortClasses: false,
     "bPaginate":false,
     "aaData": parties,
     aoColumnDefs: [
-      {"aTargets":[0],sTitle:"",mData:"id",mRender:function (data,type,full) {return "<a class='ui-icon ui-icon-person' href='"+CRM.url('civicrm/contact/view', {"reset": 1, "cid":data})+"'></a>";}},
+      {"aTargets":[0],sTitle:"",mData:"id",mRender:function (data,type,full) {return "<a class='crm-i fa-address-book-o' href='"+CRM.url('civicrm/contact/view', {"reset": 1, "cid":data})+"'></a>";}},
       {"aTargets":[1], "sTitle": "name", mData: "organization_name",sClass: "editable"},
       { "aTargets":[2],"sTitle": "group", mData:epgroup_field,"sClass": "group" },
-      { "aTargets":[3],"sTitle": "euparty", mData:euparty_field,"sClass": "euparty" },
-      { "aTargets":[4],"sTitle": "english", mData:"legal_name","sClass": "editable" },
-      { "aTargets":[5],"sTitle": "accronym" , mData:"nick_name","sClass": "editable"},
-      { "aTargets":[6],"sTitle": "country", mData:"country", "sClass": "country" }
+//      { "aTargets":[3],"sTitle": "euparty", mData:euparty_field,"sClass": "euparty" },
+      { "aTargets":[3],"sTitle": "english", mData:"legal_name","sClass": "editable" },
+      { "aTargets":[4],"sTitle": "accronym" , mData:"nick_name","sClass": "editable"},
+      { "aTargets":[5],"sTitle": "country", mData:"country", "sClass": "country" }
       
     ],
     "fnDrawCallback": function () {
@@ -100,6 +119,7 @@ bSortClasses: false,
             oTable.fnUpdate( sValue, aPos[0], aPos[1] );
         },
           data: function(value, settings) {
+console.log(value);
               return value.replace(/<(?:.|\n)*?>/gm, '');
             },
   
@@ -109,7 +129,8 @@ bSortClasses: false,
         "onblur": "ignore" 
     };
 
-    oTable.$('td.editable').editable( function(value,settings) {
+
+    CRM.$('td.editable').crmEditable(function(value,settings) {
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
       row= pos[0];
@@ -134,7 +155,7 @@ bSortClasses: false,
     settings.data=euparties_flat;
     settings.onblur = 'submit';
  
-    oTable.$('td.euparty').editable( function(value,settings) {
+    oTable.$('td.euparty').crmEditable( function(value,settings) {
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
       row= pos[0];
@@ -160,7 +181,7 @@ bSortClasses: false,
     settings.data=groups_flat;
     settings.onblur = 'submit';
  
-    oTable.$('td.group').editable( function(value,settings) {
+    oTable.$('td.group').crmEditable( function(value,settings) {
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
       row= pos[0];
@@ -183,7 +204,7 @@ bSortClasses: false,
 
     /* Apply the jEditable handlers to the countries */
     settings.data=countries_flat;
-    oTable.$('td.country').editable( function(value,settings) {
+    oTable.$('td.country').crmEditable( function(value,settings) {
       $(this).addClass ('crm-editable-saving');
       pos = oTable.fnGetPosition( this );
       row= pos[0];
@@ -263,7 +284,7 @@ bSortClasses: false,
       
     $("#add").click(function () { $("#new_dialog").dialog('open'); });
 
-    $('#contacts select').live('change', function () {
+    $('#contacts select').on('change', function () {
       $(this).closest("form").submit();
 //      alert("Change Event Triggered On:" + $(this).attr("value"));
     });
@@ -304,4 +325,3 @@ bSortClasses: false,
 <input type="submit" name="save" class="btn-primary form-submit"/>
 </form>
 </div>
-
