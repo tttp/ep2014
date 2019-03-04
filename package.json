@@ -1,0 +1,30 @@
+{
+  "name": "ep2019",
+  "version": "1.0.0",
+  "description": "CiviCRM extension developped for ep2019",
+  "main": "index.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "datatables.net-bs": "^1.10.19",
+    "datatables.net-buttons-bs": "^1.5.4",
+    "jszip": "^3.2.0",
+    "concat": "^1.0.3",
+    "uglify-js": "^3.4.9"
+  },
+  "scripts": {
+    "js": "mkdir -p dist/js && concat -o dist/js/scripts.js node_modules/jszip/dist/jszip.min.js node_modules/datatables.net-bs/js/dataTables.bootstrap.min.js node_modules/datatables.net-buttons/js/dataTables.buttons.js node_modules/datatables.net-buttons/js/buttons.html5.js",
+    "concat": "npm run js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tttp/ep2014.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tttp/ep2014/issues"
+  },
+  "homepage": "https://github.com/tttp/ep2014#readme"
+}

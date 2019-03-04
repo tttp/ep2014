@@ -12,9 +12,11 @@ class CRM_Editor_Page_Party extends CRM_Core_Page {
 
    }
     CRM_Core_Resources::singleton()
-     ->addScriptFile('civicrm.root','js/jquery/jquery.crmEditable.js', -9998, 'html-header', FALSE)
-     ->addScriptFile('org.ep2019.editor', 'js/datatable/media/js/jquery.dataTables.js', -9998, 'html-header', FALSE);
-
+	    ->addScriptFile('civicrm.root','js/jquery/jquery.crmEditable.js', 0, 'html-header', FALSE)
+	    ->addScriptFile('civicrm.root','packages/jquery/plugins/jquery.jeditable.min.js', 0, 'html-header', FALSE)
+     //->addScriptFile('org.ep2019.editor', 'js/datatable/media/js/jquery.dataTables.js', -9998, 'html-header', FALSE);
+     //->addScriptFile('org.ep2019.editor', 'dist/js/script.js', -9998, 'html-header', FALSE);
+;
 //    ->addScriptFile('org.ep2019.editor', 'js/datatable/media/js/jquery.dataTables.js', 0, 'html-header', FALSE);
 
     parent::run();

@@ -7,7 +7,7 @@ class CRM_Editor_Page_Candidate extends CRM_Core_Page {
      CRM_Core_Resources::singleton()
       ->addScriptFile('org.ep2019.editor', 'TableTools/js/dataTables.tableTools.min.js', 110, 'html-header', FALSE);
 
-    $datediff = strtotime("2014-05-22") - time();
+    $datediff = strtotime("2019-05-23") - time();
     $days= floor($datediff/(60*60*24));
     $q = explode ("/",$_GET["q"]);
     if (count($q)>2) {

@@ -110,10 +110,9 @@ function civicrm_api3_candidate_setvalue ($params) {
 }
 
 function civicrm_api3_candidate_get ($params) {
-
   $sqlParam = array();
-  $select ="c.id as id, first_name, last_name, email, civicrm_email.id as email_id, civicrm_value_ep_1.id as candidate_id, country_3 as country, position_2 as position, party_5 as party, euparty_18 as euparty, constituency_4 as constituency, ep2014_30 as elected, contact_sub_type as type, categorie_19 as priority, website.url as website, facebook.url as facebook, twitter.url as twitter, image_URL";
-  $join="LEFT JOIN civicrm_value_ep_1 ON civicrm_value_ep_1.entity_id = c.id ";
+  $select ="c.id as id, first_name, last_name, email, civicrm_email.id as email_id, mep.id as candidate_id, country_4 as country, position_6 as position, party_5 as party, '' as euparty, '' as constituency, elected_7 as elected, contact_sub_type as type, '' as priority, website.url as website, facebook.url as facebook, twitter.url as twitter, image_URL";
+  $join="LEFT JOIN civicrm_value_mep_2 mep ON mep.entity_id = c.id ";
   $join .= "LEFT JOIN civicrm_email ON c.id = civicrm_email.contact_id AND is_primary=1 ";
   $join .= "LEFT JOIN civicrm_website as website ON website.contact_id=c.id AND website.website_type_id=1 ";
   $join .= "LEFT JOIN civicrm_website as facebook ON facebook.contact_id=c.id AND facebook.website_type_id=3 ";
@@ -132,10 +131,10 @@ function civicrm_api3_candidate_get ($params) {
     $where .= " OR contact_sub_type like '%mep%'";
   }
   if (array_key_exists ("elected",$params)) {
-     $where .= " AND ep2014_30 like '%1%'";
+     $where .= " AND elected_/ like '%1%'";
   }
   if (array_key_exists ("country",$params)) {
-    $where .= " AND civicrm_value_ep_1.country_3 = %1";
+    $where .= " AND mep.country_4 = %1";
     $sqlParam =  array(1 => array((int) $params["country"], 'Integer'));
   }
     $where .= " AND c.is_deleted = 0";
@@ -145,6 +144,7 @@ function civicrm_api3_candidate_get ($params) {
     if (strpos($params["return"],"sub_type") !== false)
       $select .= " , contact_sub_type "; 
   }
+
 
   $sql = "SELECT $select FROM civicrm_contact as c $join WHERE $where";
   $dao = CRM_Core_DAO::executeQuery($sql, $sqlParam); 

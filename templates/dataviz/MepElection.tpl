@@ -1,6 +1,6 @@
 <script>
 {assign var="epgroup_field" value="group"}
-{assign var="country_field" value="custom_4"}
+{assign var="country_field" value="custom_3"}
 {assign var="party_field" value="custom_5"}
 {assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
 
@@ -12,12 +12,12 @@ var countries = {crmAPI entity="Country" sequential=0}.values;
 var country_field = "{$country_field}";
 var party_field = "{$party_field}";
 
-var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,country,custom_1" option_sort="organization_name ASC"}.values;
+var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,country,custom_10" option_sort="organization_name ASC"}.values;
 
-var epgroups = {crmAPI entity="Contact" contact_sub_type="eugroup" sequential=0 return="organization_name,nick_name,legal_name" option_limit=1000}.values;
+var epgroups = {crmAPI entity="Contact" contact_sub_type="epparty" sequential=0 return="organization_name,nick_name,legal_name" option_limit=1000}.values;
 
 
-var candidates = {crmAPI entity="Candidate" return="created"}.values;
+var candidates = {crmAPI entity="Candidate" return="created" elected=1}.values;
 
 {literal}
 var epgroups_color = {

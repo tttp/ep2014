@@ -6,12 +6,12 @@
 
 var epgroup_field = "{$epgroup_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
-var countries = {crmAPI entity="Country"}.values;
+var countries = {crmAPI sequential=0 entity="Country"}.values;
 
 var country_field = "{$country_field}";
 var party_field = "{$party_field}";
 
-var parties = {crmAPI entity="Contact" contact_sub_type="party" option_limit=1000 return="organization_name,country" option_sort="organization_name ASC"}.values;
+var parties = {crmAPI entity="Contact" sequential=0 contact_sub_type="party" option_limit=1000 return="organization_name,country" option_sort="organization_name ASC"}.values;
 
 var candidates = {$candidates};
 {literal}
@@ -95,7 +95,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
 //TODO: add the editable
     }
   });
-    $(".ui-widget-header").append("<button id='add' class='add_row ui-state-default'>Add</button>");
+//    $(".ui-widget-header").append("<button id='add' class='add_row ui-state-default'>Add</button>");
 
    var editableSettings = { 
      callBack:function(data){
@@ -295,11 +295,22 @@ td {word-break:break-word}
 </style>
 {/literal}
 
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new_dialog">
+  <i class="crm-i fa-plus-circle"></i>Add
+</button>
 <table id="contacts"></table>
-
-<div id="new_dialog">
+<!-- Modal -->
+<div class="modal fade" id="new_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
 <form>
-<div class="form-item">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Create new candidate</h4>
+      </div>
+      <div class="modal-body">
+
+
+<div class="form-group">
 <label>First Name</label>
 <input id="first_name"  class="form-control "/>
 <label>Last Name</label>
@@ -307,27 +318,39 @@ td {word-break:break-word}
 <label>Email</label>
 <input id="email"  class="form-control "/>
 </div>
-<div class="form-item">
+<div class="form-group">
 <label>Country</label>
-<select id="{$country_field}"  class="form-control ">
+<select id="{$country_field}"  class="form-control crm-form-select">
 </select>
 <label>Party</label>
-<select id="{$party_field}"  class="form-control ">
+<select id="{$party_field}"  class="form-control crm-form-select">
 </select>
 </div>
-<div class="form-item">
+<div class="form-group">
 <label>Website</label>
 <input id="website" class="form-control "/>
 </div>
-<div class="form-item">
+<div class="form-group">
 <label>Facebook</label>
 <input id="facebook"  class="form-control "/>
 </div>
-<div class="form-item">
+<div class="form-group">
 <label>Twitter</label>
 <input id="twitter"  class="form-control "/>
 </div>
 
-<input type="submit" value="Add" name="save" class="btn-primary form-submit"/>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+<input type="submit" name="save" value="Add Candidate" class="btn btn-primary form-submit"/>
+      </div>
+    </div>
+</form>
+  </div>
+</div>
+
+<div id="aaanew_dialog">
+<form>
 </form>
 </div>
