@@ -4,7 +4,10 @@ require_once 'CRM/Core/Page.php';
 //    <script type="text/javascript" charset="utf-8" src="media/js/TableTools.js"></script>
 class CRM_Editor_Page_Candidate extends CRM_Core_Page {
   function run() {
-     CRM_Core_Resources::singleton()
+	  CRM_Core_Resources::singleton()
+            ->addScriptFile('civicrm.root','js/jquery/jquery.crmEditable.js', 0, 'html-header', FALSE)
+            ->addScriptFile('civicrm.root','packages/jquery/plugins/jquery.jeditable.min.js', 0, 'html-header', FALSE)
+
       ->addScriptFile('org.ep2019.editor', 'TableTools/js/dataTables.tableTools.min.js', 110, 'html-header', FALSE);
 
     $datediff = strtotime("2019-05-23") - time();

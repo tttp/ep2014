@@ -65,7 +65,7 @@ function civicrm_api3_candidate_denormalise ($params) {
 
 
 function civicrm_api3_candidate_create ($params) {
-  foreach (array ("elected"=>"custom_30","position"=>"custom_2","country"=>"custom_3","constituency"=>"custom_4","party"=>"custom_5") as $a => $f) {
+  foreach (array ("elected"=>"custom_7","position"=>"custom_6","country"=>"custom_4","twitter"=>"custom_8","party"=>"custom_5") as $a => $f) {
     if (array_key_exists ($a,$params)) {
       $params[$f] = $params[$a];
     }
@@ -96,46 +96,42 @@ function civicrm_api3_candidate_setvalue ($params) {
         return civicrm_api3("email","create",array("contact_id"=>$params["id"],"is_primary"=>1,"email"=>$params["value"]));
      }
   }
-  if ($params["field"] == "facebook" || $params["field"] == "twitter" || $params["field"] == "website")  {
-     if ($params["field"] == "website") $params["field"] = "home";
-     $r=civicrm_api3("website","get",array("website_type_id"=>$params["field"],"contact_id"=>$params["id"]));
-     if ($r["count"]==1) {
-        return civicrm_api3("website","create",array("id"=>$r["id"],"url"=>$params["value"]));
-     } else {
-        return civicrm_api3("website","create",array("contact_id"=>$params["id"],"website_type_id"=>$params["field"],"url"=>$params["value"]));
-     } 
-  }
+  if ($params["field"] == "twitter") $params["field"]= "custom_8";
   if ($params["field"] == "elected") $params["field"]= "custom_30";
   return civicrm_api3("contact","setvalue",$params);
 }
 
 function civicrm_api3_candidate_get ($params) {
   $sqlParam = array();
-  $select ="c.id as id, first_name, last_name, email, civicrm_email.id as email_id, mep.id as candidate_id, country_4 as country, position_6 as position, party_5 as party, '' as euparty, '' as constituency, elected_7 as elected, contact_sub_type as type, '' as priority, website.url as website, facebook.url as facebook, twitter.url as twitter, image_URL";
   $join="LEFT JOIN civicrm_value_mep_2 mep ON mep.entity_id = c.id ";
-  $join .= "LEFT JOIN civicrm_email ON c.id = civicrm_email.contact_id AND is_primary=1 ";
-  $join .= "LEFT JOIN civicrm_website as website ON website.contact_id=c.id AND website.website_type_id=1 ";
-  $join .= "LEFT JOIN civicrm_website as facebook ON facebook.contact_id=c.id AND facebook.website_type_id=3 ";
-  $join .= "LEFT JOIN civicrm_website as twitter ON twitter.contact_id=c.id AND twitter.website_type_id=4 ";
-  if (array_key_exists ("group",$params)) {
-    $select .= ",date(hist.date) as added ";
-    $join .= "join civicrm_group_contact as g on g.group_id=%1 and c.id=g.contact_id and status = 'Added' ";
-    $join .= "join (select max(id) as hist_id, contact_id,date,status from civicrm_subscription_history where group_id=%1 group by contact_id) hist on hist.contact_id=c.id";
-    $sqlParam =  array(1 => array((int) $params["group"], 'Integer'));
-    $where = "contact_sub_type like '%candidate%' and hist.status='Added'";
+  $select ="c.id as id, c.first_name, c.last_name, country_4 as country, position_6 as position, party_5 as party, elected_7 as elected,  twitter_8 as twitter";
+  if (! ($params["options"] && $params["options"]["public"])){
+    $select .= ",mep.id as candidate_id,c.contact_sub_type as type,email, civicrm_email.id as email_id";
+    $join .= " LEFT JOIN civicrm_email ON c.id = civicrm_email.contact_id AND is_primary=1 ";
   } else {
-    $params["group"] = null;
-    $where = "contact_sub_type like '%candidate%'";
+    $select = "civicrm_country.name as country_name, iso_code as country_iso,p.organization_name as party_name," . $select;
+    $join .= " LEFT JOIN civicrm_contact p ON p.id = party_5 LEFT JOIN civicrm_country ON civicrm_country.id=country_4 ";
+  }
+  if (array_key_exists ("pledge",$params)) {
+	  $join .=
+		  " join civicrm_activity_contact ac on ac.contact_id=c.id and record_type_id=3"
+		  ." join civicrm_activity a on activity_id=a.id  and activity_type_id=32 and a.status_id=2"
+		  ." join civicrm_campaign camp on camp.id=campaign_id and camp.name=%2";
+     $where = " (1=1) ";
+     $sqlParam[2] = array($params["pledge"], 'String');
+  } else {
+    $params["pledge"] = null;
+    $where = "c.contact_sub_type like '%candidate%'";
   }
   if (array_key_exists ("filter_include",$params)) {
-    $where .= " OR contact_sub_type like '%mep%'";
+    $where .= " OR c.contact_sub_type like '%mep%'";
   }
   if (array_key_exists ("elected",$params)) {
      $where .= " AND elected_/ like '%1%'";
   }
   if (array_key_exists ("country",$params)) {
     $where .= " AND mep.country_4 = %1";
-    $sqlParam =  array(1 => array((int) $params["country"], 'Integer'));
+    $sqlParam [1] = array((int) $params["country"], 'Integer');
   }
     $where .= " AND c.is_deleted = 0";
   if (array_key_exists ("return",$params)) {

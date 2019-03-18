@@ -25,6 +25,14 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/pledge</path>
+    <page_callback>CRM_Public_Page_Pledge::Json</page_callback>
+    <title>Candidates that have signed</title>
+    <access_arguments>access AJAX API</access_arguments>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+  </item>
+  <item>
     <path>civicrm/candidate/view</path>
     <page_callback>CRM_Editor_Page_ROCandidate</page_callback>
     <title>View Candidates</title>

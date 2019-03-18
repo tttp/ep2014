@@ -1,3 +1,4 @@
+node_modules/*
 js/datatable/Readme.txt
 js/datatable/component.json
 js/datatable/docs/

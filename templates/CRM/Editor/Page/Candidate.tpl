@@ -1,6 +1,6 @@
 <script>
 {assign var="epgroup_field" value="group"}
-{assign var="country_field" value="custom_3"}
+{assign var="country_field" value="custom_4"}
 {assign var="party_field" value="custom_5"}
 {assign var="return_party" value="organization_name,nick_name,legal_name,country,$epgroup_field"}
 
@@ -87,9 +87,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
         { "aTargets":[3],"sTitle": "country", mDataProp:"country", "sClass": "country" },
         { "aTargets":[4],"sTitle": "party", mDataProp:"party", "sClass": "party" },
         { "aTargets":[5],"sTitle": "email" , mDataProp:"email","sClass": "editable"},
-        { "aTargets":[6],"sTitle": "website" , mDataProp:"website","sClass": "editable"},
-        { "aTargets":[7],"sTitle": "facebook" , mDataProp:"facebook","sClass": "editable"},
-        { "aTargets":[8],"sTitle": "twitter" , mDataProp:"twitter","sClass": "editable"},
+        { "aTargets":[6],"sTitle": "twitter" , mDataProp:"twitter","sClass": "editable"},
     ],
     "fnDrawCallback": function () {
 //TODO: add the editable
@@ -238,41 +236,37 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
       o = o + "<option value='"+d.id+"'>"+d.organization_name+"</option>";
     });
     $("#new_dialog select#"+party_field).append (o);
-    $("#new_dialog").dialog({"modal":true, autoOpen:false}).submit (function (e) {
+    $("#new_dialog")//.dialog({"modal":true, autoOpen:false}).
+        .submit (function (e) {
       e.preventDefault();
-      var fields = ["first_name", "last_name", "website", "facebook", "twitter","email",party_field,country_field];
+      var fields = ["first_name", "last_name", "twitter","email",party_field,country_field];
       var params = {
         "dedupe_check":true,
         "source": "civicrm/candidate",
         "sequential": 1,
         "contact_type":"Individual",
-        "contact_sub_type":"candidate"
+        "contact_sub_type":"Candidate"
       };
       $.each(fields, function(id) {
         params[fields[id]]=$("#"+fields[id]).val();
       });
 //      params["api.address"]={"location_type_id":2,"is_primary":1,"country_id":params["country"]};
       var entity="candidate";
-      CRM.api(entity, "create", params, {
-        context: this,
-        error: function (data) {
-          CRM.alert(data.error_message, 'Save error', 'error')
-          console.log (data);
-        },
-        success: function (data) {
+console.log(params);
+      CRM.api3(entity, "create", params,true)
+        .done(function (data) {
           params["id"]=data["id"];
-          params["party"]=parties_flat[params[country_field] ][params[party_field] ];
-          params["country"]=countries_flat[params[country_field]];
+          params["party"]=parties[params[party_field] ];
+          params["country"]=countries[params[country_field]];
           oTable.fnAddData( params);
-          $("#new_dialog").dialog('close');
-          CRM.alert(params.last_name, 'Saved', 'success')
-        }
-      });
+          CRM.$("#new_dialog").modal('hide');
+          //CRM.alert(params.last_name, 'Saved', 'success')
+        });
     });
       
-    $("#add").click(function () { $("#new_dialog").dialog('open'); });
+//    $("#add").click(function () { $("#new_dialog").dialog('open'); });
 
-    $('#contacts select').live('change', function () {
+    $('#contacts select').on('change', '',function () {
       $(this).closest("form").submit();
 //      alert("Change Event Triggered On:" + $(this).attr("value"));
     });
@@ -281,7 +275,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
       var row = oTable.fnGetPosition( $(this).closest("td")[0] )[0];
       var q=candidates[row].first_name+ " "+candidates[row].last_name +" " + candidates[row].party;
       window.open("https://www.google.com/search?q="+q, '_blank');
-   });
+   },true);
 });
 
 </script>
@@ -312,31 +306,24 @@ td {word-break:break-word}
 
 <div class="form-group">
 <label>First Name</label>
-<input id="first_name"  class="form-control "/>
+<input id="first_name"  class="form-control " required/>
 <label>Last Name</label>
-<input id="last_name"  class="form-control "/>
+<input id="last_name"  class="form-control " required/>
 <label>Email</label>
-<input id="email"  class="form-control "/>
+<input id="email"  class="form-control"/>
 </div>
 <div class="form-group">
 <label>Country</label>
-<select id="{$country_field}"  class="form-control crm-form-select">
+<select id="{$country_field}"  required class="form-control crm-form-select">
 </select>
 <label>Party</label>
-<select id="{$party_field}"  class="form-control crm-form-select">
+<select id="{$party_field}"  required class="form-control crm-form-select">
 </select>
 </div>
 <div class="form-group">
-<label>Website</label>
-<input id="website" class="form-control "/>
-</div>
-<div class="form-group">
-<label>Facebook</label>
-<input id="facebook"  class="form-control "/>
-</div>
 <div class="form-group">
 <label>Twitter</label>
-<input id="twitter"  class="form-control "/>
+<input id="twitter"  class="form-control " placeholder="@something"/>
 </div>
 
 
@@ -354,3 +341,4 @@ td {word-break:break-word}
 <form>
 </form>
 </div>
+
