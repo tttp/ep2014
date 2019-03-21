@@ -294,9 +294,9 @@ console.log(pos);
         },
         success: function (data) {
           params["id"]=data["id"];
-          params[epgroup_field]=groups_flat[params[epgroup_field]];
+          params["group"]=groups_flat[params[epgroup_field]];
           params["country"]=countries_flat[params["country"]];
-          oTable.fnAddData( params);
+          oTable.fnAddData( params);//otherwise, we skip
           $("#new_dialog").dialog('close');
           //CRM.alert(params.organization_name, 'Saved', 'success')
         }
