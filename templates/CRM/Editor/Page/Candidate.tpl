@@ -242,6 +242,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
       var fields = ["first_name", "last_name", "twitter","email",party_field,country_field];
       var params = {
         "dedupe_check":true,
+        "option":{"match":["first_name","last_name","email"]},
         "source": "civicrm/candidate",
         "sequential": 1,
         "contact_type":"Individual",
@@ -252,12 +253,11 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
       });
 //      params["api.address"]={"location_type_id":2,"is_primary":1,"country_id":params["country"]};
       var entity="candidate";
-console.log(params);
       CRM.api3(entity, "create", params,true)
         .done(function (data) {
           params["id"]=data["id"];
-          params["party"]=parties[params[party_field] ];
-          params["country"]=countries[params[country_field]];
+          params["party"]=parties[params[party_field] ].organization_name;
+          params["country"]=countries[params[country_field]].name;
           oTable.fnAddData( params);
           CRM.$("#new_dialog").modal('hide');
           //CRM.alert(params.last_name, 'Saved', 'success')

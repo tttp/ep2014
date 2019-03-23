@@ -35,7 +35,7 @@ CRM.$(function($) {
       d.country_id = parseInt(d.country_id,10);
       d.address_id = parseInt(d.address_id,10);
       d.custom_1 = parseInt(d.custom_1,10);
-      d.group = groups_flat[d.custom_1];
+      d.group = groups_flat[d.custom_1] || "?";
     });
     $.each(euparties, function(n) {
         euparties_flat[euparties[n].id]=euparties[n].organization_name;
@@ -294,10 +294,10 @@ console.log(pos);
         },
         success: function (data) {
           params["id"]=data["id"];
-          params["group"]=groups_flat[params[epgroup_field]];
-          params["country"]=countries_flat[params["country"]];
-          oTable.fnAddData( params);//otherwise, we skip
-          $("#new_dialog").dialog('close');
+          params["group"]=groups_flat[params[epgroup_field]] || "";
+          params["country"]=countries_flat[params["country"]] || "";
+          oTable.fnAddData( params);
+          CRM.$("#new_dialog").modal('hide');
           //CRM.alert(params.organization_name, 'Saved', 'success')
         }
       },true);
