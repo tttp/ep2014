@@ -15,8 +15,8 @@ var party_field = "{$party_field}";
 var parties = {crmAPI entity="Contact" sequential=0 contact_sub_type="party" option_limit=1000 return="organization_name,country,custom_10" option_sort="organization_name ASC"}.values;
 
 var epgroups = {crmAPI entity="Contact" contact_sub_type="epgroup" sequential=0 return="organization_name,nick_name,legal_name" option_limit=1000}.values;
-
-var candidates= {crmSQL file="pledged"}.values;
+var pledge="{$id}";
+var candidates= {crmSQL json="pledged" pledge=$id debug=1}.values;
 {literal}
 var epgroups_color = {
 "eu left":"#df73be",
