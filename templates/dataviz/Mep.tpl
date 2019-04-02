@@ -78,6 +78,7 @@ function draw () {
 
 //  drawDate (ndx, " .date");
   graphs.table= drawMep (ndx,  " .list");
+  graphs.total= drawTotal (  " .total");
      graphs.search = drawTextSearch('#input-filter', jQuery);
  
 //  drawParty (ndx,  selector + " .partyheat");
@@ -116,6 +117,18 @@ function draw () {
 
     }
 
+
+  function drawTotal(dom) {
+    return dc
+      .dataCount(dom)
+      .dimension(ndx)
+      .group(ndx.groupAll())
+      .html({
+        some: "%filter-count MEPs out of %total-count",
+        all:
+          '%total-count sitting MEPs. <span class="small">Click on charts to apply filters or use the search box</span>'
+      });
+  }
 
 
 function drawBinary (ndx,selector,attribute) {
@@ -247,10 +260,12 @@ function drawParty (ndx,selector) {
 <div id="ep2019"> 
 <div class="row">
 <div class="col-sm-11" >
+<h3 class="total">Total</h3>
+<div class="form-group">
 <label>Search</label>
             <span class="input-group-addon"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
-            <input type="text" id="input-filter" class="form-control" placeholder="name, party, committee...">
-
+            <input type="text" id="input-filter" class="form-control" placeholder="name, party, country...">
+</div>
 </div>
 </div>
     <table class="table table-hover list">
