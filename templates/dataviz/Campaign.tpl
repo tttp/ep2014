@@ -49,6 +49,7 @@ var seats= {"DE":"96","FR":"74","GB":"73","IT":"73","ES":"54","PL":"51","RO":"32
 
 var parties_flat = {"_": {}}; 
 var parties_map = {}; 
+  var graphs =[];
 
 cj(function($) {
     $("h1").html(candidates.length +" meps").hide();
@@ -71,13 +72,13 @@ cj(function($) {
 });
 
 function draw () {
-  var graphs =[];
   var ndx = crossfilter(candidates),
   all = ndx.groupAll();
 
 //  drawDate (ndx, " .date");
   graphs.table= drawTable (ndx,  " .list");
      graphs.search = drawTextSearch('#input-filter', jQuery);
+  graphs.status = drawStatus(".statuspledge");
  
 //  drawParty (ndx,  selector + " .partyheat");
 //  drawBinary (ndx, selector + " .email","email");
@@ -116,6 +117,25 @@ function draw () {
     }
 
 
+function drawStatus (dom){
+  var dim=ndx.dimension(function(d){return d.status_id});
+  var group   = dim.group().reduceSum(function(d) {   return 1; });
+  var graph = dc.pieChart(dom)
+//.innerRadius(3).radius(25)
+  .width(0)
+  .height(0)
+  .dimension(dim)
+  .label(function(d){
+     var status={1:"?",2:"👍",3:"👎"};
+     return status[d.key];
+  })
+  .ordering(dc.pluck('key'))
+  .colors(d3.scaleOrdinal().range(['#e6ab5e','#0071bd','#4d4d69']))
+  .group(group);
+
+  return graph;
+
+}
 
 function drawBinary (ndx,selector,attribute) {
   var dim = ndx.dimension(function(d) {
@@ -124,13 +144,14 @@ function drawBinary (ndx,selector,attribute) {
     return "Complete";
   });
   var group   = dim.group().reduceSum(function(d) {   return 1; });
-  var pie = dc.pieChart(selector).innerRadius(3).radius(25)
+  var graph = dc.pieChart(selector).innerRadius(3).radius(25)
   .width(50)
   .height(50)
   .dimension(dim)
   .renderLabel(false)
-  .colors(d3.scale.ordinal().range(['#3a6033','#b00000']))
+//  .colors(d3.scale.ordinal().range(['#3a6033','#b00000']))
   .group(group);
+  return graph;
 }
 
 function drawTable (ndx,selector) {
@@ -178,14 +199,18 @@ function drawTable (ndx,selector) {
         .order(d3.descending)
         .on('renderlet', function(chart) {
           CRM.$("table").on("click",".btn-status .btn",function() {
-            var status_id=CRM.$(this).data("value");
-console.log(status_id);
-            var activity_id=CRM.$(this).closest(".btn-status").data("id");
+            var btn=CRM.$(this);
+            var status_id=btn.data("value");
+            var activity_id=btn.closest(".btn-status").data("id");
             console.log(activity_id+":"+status_id);
             CRM.api3("Activity","create",{
               id:activity_id,
               status_id:status_id
-            },true);
+            },true)
+            .done(function(result){
+              btn.closest(".btn-group").find(".btn").attr("disabled",false);
+              btn.attr("disabled","disabled");
+            });
              
           });
 
@@ -236,6 +261,92 @@ function drawParty (ndx,selector) {
 
 };
 
+cj(function($){
+      $("#csv").click(function(e) {
+        download_csv();
+        e.stopPropagation();
+      });
+
+      $("#excel").click(function(e) {
+        download_excel();
+        e.stopPropagation();
+      });
+
+    function download_csv() {
+      var csv="";
+      var line = function (d){
+          csv += d.join(',') + "\n";
+      };
+      prepareData(line,line);
+      window.open('data:application/csv; charset=utf-8,' + encodeURI(csv));
+    }
+
+function download_excel() {
+
+  var uri = 'data:application/vnd.ms-excel;base64,',
+  template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><?xml version="1.0" encoding="UTF-8" standalone="yes"?><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
+  base64 = function(s) {
+    return window.btoa(unescape(encodeURIComponent(s)))
+  },
+  format = function(s, c) {
+    return s.replace(/{(\w+)}/g, function(m, p) {
+      return c[p];
+    })
+  }
+
+ var toExcel = "<thead><tr>";
+  var head= function(d){
+    for (var c in d) {
+      toExcel += "<th>" + d[c] + "</th>";
+    };
+    toExcel += "</tr>";
+    toExcel += "</thead><tbody>\n";
+  };
+
+  var row= function(d){
+    toExcel += "<tr>";
+    for (var c in d) {
+      toExcel += "<td>" + d[c] + "</td>";
+    };
+    toExcel += "</tr>\n";
+  };
+
+  prepareData(row,head);
+  toExcel+="</tbody>";
+
+  var ctx = {
+    worksheet: name || 'person',
+    table: toExcel
+  };
+  window.open(uri + base64(format(template, ctx)));
+
+}
+
+    function status(id){
+      var name={1:"pending",2:"validated",3:"cancelled"};
+      return name[id];
+    }
+
+    function prepareData(row,head) {
+      var col =  "first_name,last_name,country,party,twitter,email,id,date,status".split(",");
+      head(col);
+      graphs.table.dimension().top(Number.POSITIVE_INFINITY).forEach(function(d) {
+        row([
+          d.first_name
+          ,d.last_name
+          ,d.country
+          ,d.party
+          ,d.twitter ? d.twitter: ""
+          ,d.mail ? d.mail:""
+          ,d.id
+          ,d.date
+          ,status(d.status_id)
+        ]);
+      });
+    }
+
+});
+
 {/literal}
 </script>
 
@@ -243,23 +354,37 @@ function drawParty (ndx,selector) {
 <style>
 #binaries {width:60px;}
 #ep2019 .clear {clear:both}
-
+table .btn {
+  border-radius: 0px!important;
+}
+table .btn:disabled {
+  border-radius: 10px!important;
+}
 .heat-box {
   stroke: #E6E6E6;
   stroke-width: 2px;
 }
+.statuspledge svg .pie-slice {font-size:30px;}
 </style>
 {/literal}
 
 <div id="ep2019"> 
 <div class="row">
-<div class="col-sm-11" >
-<label>Search</label>
-            <span class="input-group-addon"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+<div class="col-sm-4">
+<div class="statuspledge">
+</div>
+</div>
+<div class="col-sm-4" >
+<div class="input-group input-group-lg">
+<span class="hidden input-group-addon">🔎</span>
             <input type="text" id="input-filter" class="form-control" placeholder="name, party, committee...">
-
 </div>
 </div>
+<div class="col-sm-4">
+<i class='crm-i fa-download' id="csv"></i>
+<i class='crm-i fa-file-excel-o' id="excel"></i>
+</div>
+</div> 
     <table class="table table-hover list">
         <thead>
         <tr class="header">
@@ -272,6 +397,3 @@ function drawParty (ndx,selector) {
         </thead>
     </table>
 
-</div> 
-<div class="clear"></div>
-</div>
