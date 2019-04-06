@@ -1,3 +1,4 @@
+{crmTitle title="Candidates dashboard"}
 <script>
 {assign var="epgroup_field" value="group"}
 {assign var="country_field" value="custom_4"}
@@ -8,7 +9,7 @@ var selector = "#ep2019";
 var epgroup_field = "{$epgroup_field}";
 var countries_flat = {crmAPI sequential=0 entity="Constant" name="country"}.values;
 var countries = {crmAPI entity="Country" sequential=0}.values;
-
+var graphs;
 var country_field = "{$country_field}";
 var party_field = "{$party_field}";
 
@@ -21,29 +22,25 @@ var candidates = {crmAPI entity="Candidate" return="created"}.values;
 
 {literal}
 var epgroups_color = {
-"eu left":"#df73be",
-"PES":"#ec2335",
-"EFA":"#67bd1b",
-"EGP":"#67bd1b",
-"ALDE":"#f1cb01",
-"EFD":"#60c0e2",
-"PPE":"blue",
-"EPP":"blue",
-"MELD":"#00cc44",
-"EUD":"#00cc99",
-"ECPM":"#00cc",
-"PPEU":"purple",
-"ECR":"darkblue",
-"Non-attached Members":"grey",
-"NA/NI":"grey",
-"EDP":"cyan",
-"AECR":"brown",
+      "GUE/NGL": "#800c00",
+      "S&D": "#c21200",
+      "Verts/ALE": "#05a61e",
+      "Greens/EFA": "#05a61e",
+      "ALDE": "#ffc200",
+      "EFDD": "#5eced6",
+      "PPE": "#0a3e63",
+      "EPP": "#0a3e63",
+      "ECR": "#3086c2",
+      "NA/NI": "#cccccc",
+      "NA,NI": "#cccccc",
+      "ENF": "#A1480D",
+      "Array": "pink",
 "None":"pink"
 };
 
 var seats= {"DE":"96","FR":"74","GB":"73","IT":"73","ES":"54","PL":"51","RO":"32","NL":"26","GR":"21","BE":"21","PT":"21","CZ":"21","HU":"21","SE":"20","AT":"18","BG":"17","DK":"13","SK":"13","FI":"13","IE":"11","HR":"11","LT":"11","SL":"8","LV":"8","SI":"7","EE":"6","CY":"6", "LU":"6","MT":"6"};
 
-  var color = d3.scale.linear()
+  var color = d3.scaleLinear()
     .clamp(true)
     .domain([0, 0.9, 1, 10])
     .range(["#b00000","#f4d8d8","#d0e5cc","#3a6033"])
@@ -67,9 +64,9 @@ cj(function($) {
       parties_map[parties[n].id]=[n];
     });
 
-    var dateFormat = d3.time.format("%Y-%m-%d");
+    var dateFormat = d3.timeParse("%Y-%m-%d");
     $.each(candidates, function(n,c) {
-       c.dateCreated = dateFormat.parse(c.created);
+       c.dateCreated = c.created ? dateFormat(c.created) : dateFormat(c.modified);
     });
 
     draw ();
@@ -83,7 +80,7 @@ function draw () {
 
   var group = ndx.dimension(function(d) {
     if (!d.party || !parties_map[d.party] || !parties[parties_map[d.party]]) return "";
-    return parties[parties_map[d.party]].custom_10;
+    return parties[parties_map[d.party]].custom_1;
   });
   var groupGroup   = group.group().reduceSum(function(d) {   return 1; });
   var pie_group = dc.pieChart(selector +  " .group").innerRadius(20).radius(70);
@@ -100,8 +97,8 @@ function draw () {
   drawCandidate (ndx, selector + " .list");
   drawParty (ndx,  selector + " .partyheat");
   drawBinary (ndx, selector + " .email","email");
-  drawBinary (ndx, selector + " .website","website");
-  drawBinary (ndx, selector + " .facebook","facebook");
+//  drawBinary (ndx, selector + " .website","website");
+//  drawBinary (ndx, selector + " .facebook","facebook");
   drawBinary (ndx, selector + " .twitter","twitter");
 
   var bar_country = dc.barChart(selector + " .country");
@@ -128,7 +125,6 @@ function draw () {
   .title(function (d) { 
     if (!d.key) return "xx";
     return parties_flat[d.key].organization_name;})
-  .colors(d3.scale.category20())
   .group(groupParty)
   .renderlet(function (chart) {
   });
@@ -176,7 +172,7 @@ function draw () {
       })
 
   .margins({top: 0, right: 0, bottom: 95, left: 40})
-  .x(d3.scale.ordinal())
+  .x(d3.scaleOrdinal())
   .xUnits(dc.units.ordinal)
   .brushOn(false)
   .elasticY(true)
@@ -218,7 +214,7 @@ function drawDate (ndx,selector) {
     .width(666)
     .height(140)
     .margins({top: 0, right: 0, bottom: 20, left: 40})
-    .x(d3.time.scale().domain([new Date("2014-02-14"),new Date("2014-05-22")]))
+    .x(d3.scaleTime().domain([new Date("2019-02-14"),new Date("2019-05-22")]))
     .brushOn(true)
     .renderArea(true)
     .elasticY(true)
@@ -239,7 +235,7 @@ function drawBinary (ndx,selector,attribute) {
   .height(50)
   .dimension(dim)
   .renderLabel(false)
-  .colors(d3.scale.ordinal().range(['#3a6033','#b00000']))
+  .colors(d3.scaleOrdinal().range(['#3a6033','#b00000']))
   .group(group);
 }
 
@@ -270,8 +266,8 @@ function drawCandidate (ndx,selector) {
                 return countries[d.country].iso_code || "??";
             },
             function (d) {
-                if (!d.party || !parties_map[d.party] || ! epgroups[parties[parties_map[d.party]].custom_10]) return "?";
-                return epgroups[parties[parties_map[d.party]].custom_10].organization_name || "??";
+                if (!d.party || !parties_map[d.party] || ! epgroups[parties[parties_map[d.party]].custom_1]) return "?";
+                return epgroups[parties[parties_map[d.party]].custom_1].organization_name || "??";
             }
         ])
         .sortBy(function (d) {
@@ -283,7 +279,7 @@ function drawCandidate (ndx,selector) {
 function drawParty (ndx,selector) {
   var dim = ndx.dimension(function(d) {
     if (typeof d.party === "undefined" || typeof parties_map[d.party] === "undefined") return "";
-    return [d.country,parties[parties_map[d.party]].custom_10];
+    return [d.country,parties[parties_map[d.party]].custom_1];
   });
   var group   = dim.group().reduceSum(function(d) { return +1; });
 
@@ -352,8 +348,6 @@ function drawParty (ndx,selector) {
 <div class="partyheat"></div> 
 <div id="binaries" class ="dc-chart"> 
   <div class="email">Email</div> 
-  <div class="website">Website</div> 
-  <div class="facebook">Facebook</div> 
   <div class="twitter">Twitter</div> 
 </div>
 <div class="no.party"></div>
