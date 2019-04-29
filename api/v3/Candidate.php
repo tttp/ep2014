@@ -116,7 +116,7 @@ function civicrm_api3_candidate_get ($params) {
 	  $join .=
 		  " join civicrm_activity_contact ac on ac.contact_id=c.id and record_type_id=3"
 		  ." join civicrm_activity a on activity_id=a.id  and activity_type_id=32 and a.status_id=2"
-		  ." join civicrm_campaign camp on camp.id=campaign_id and camp.name=%2";
+		  ." join civicrm_campaign camp on camp.id=campaign_id and (camp.name=%2 or camp.external_identifier=%2)";
      $where = " (1=1) ";
      $sqlParam[2] = array($params["pledge"], 'String');
   } else {
