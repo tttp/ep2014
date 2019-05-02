@@ -8,7 +8,8 @@ class CRM_Editor_Page_Candidate extends CRM_Core_Page {
             ->addScriptFile('civicrm.root','js/jquery/jquery.crmEditable.js', 0, 'html-header', FALSE)
             ->addScriptFile('civicrm.root','packages/jquery/plugins/jquery.jeditable.min.js', 0, 'html-header', FALSE)
 
-      ->addScriptFile('org.ep2019.editor', 'TableTools/js/dataTables.tableTools.min.js', 110, 'html-header', FALSE);
+          ->addScriptFile('org.ep2019.editor', 'js/datatable/dataTables.buttons.min.js','html-header', FALSE);
+          //      ->addScriptFile('org.ep2019.editor', 'TableTools/js/dataTables.tableTools.min.js', 110, 'html-header', FALSE);
 
     $datediff = strtotime("2019-05-23") - time();
     $days= floor($datediff/(60*60*24));
