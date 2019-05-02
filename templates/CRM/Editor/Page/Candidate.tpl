@@ -17,6 +17,45 @@ var candidates = {$candidates};
 {literal}
 var parties_flat = {"_": {}}; 
 
+ function exportToExcel() {
+        var tab_text = "<tr bgcolor='#87AFC6'>";
+        var textRange; var j = 0, rows = '';
+//        tab = document.getElementById('candidates');
+        var cols="id,first_name,last_name,email,twitter,party,position".split(",");
+//        tab_text = tab_text + tab.rows[0].innerHTML + "</tr>";
+            cols.forEach(function(col){
+              tab_text += '<td>' + col + '</td>'
+            });
+            tab_text += '</tr>';
+        candidates.forEach (function(d){
+            rows += '<tr>';
+            cols.forEach(function(col){
+              rows += '<td>' + d[col] + '</td>'
+            });
+            rows += '</tr>';
+        });
+        tab_text += rows;
+        var data_type = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table border="2px">{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) {
+                    return c[p];
+                })
+            }
+
+        var ctx = {
+            worksheet: "Sheet 1" || 'Worksheet',
+            table: tab_text
+        }
+        document.getElementById("dlink").href = data_type + base64(format(template, ctx));
+        document.getElementById("dlink").download = "candidates.xls";
+        document.getElementById("dlink").traget = "_blank";
+        document.getElementById("dlink").click();
+    }
+
 cj(function($) {
     countries_flat["_"]="-select-";
 
@@ -70,7 +109,8 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
 } );
     var oTable = $('#contacts').dataTable( {
     "sDom": "<'ui-widget-header'<'span6'T><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-    "oTableTools": {
+    buttons: ["excel"],
+    "bbboTableTools": {
       "sSwfPath": "/extensions/ep2019/TableTools/swf/copy_csv_xls.swf",
     },
     aaSorting:[],
@@ -90,6 +130,8 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
         { "aTargets":[6],"sTitle": "twitter" , mDataProp:"twitter","sClass": "editable"},
     ],
     "fnDrawCallback": function () {
+       $(".ui-widget-header .btn").hide();
+       $(".DTTT_button_xls").show().click(exportToExcel);
 //TODO: add the editable
     }
   });
@@ -341,4 +383,4 @@ td {word-break:break-word}
 <form>
 </form>
 </div>
-
+<a id="dlink">a</a>

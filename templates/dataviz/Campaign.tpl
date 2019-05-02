@@ -16,7 +16,7 @@ var parties = {crmAPI entity="Contact" sequential=0 contact_sub_type="party" opt
 
 var epgroups = {crmAPI entity="Contact" contact_sub_type="epgroup" sequential=0 return="organization_name,nick_name,legal_name" option_limit=1000}.values;
 var pledge="{$id}";
-var candidates= {crmSQL json="pledged" pledge=$id debug=1}.values;
+var candidates= {crmSQL json="pledged" pledge=$id}.values;
 {crmTitle title=$id}
 {literal}
 var epgroups_color = {
@@ -190,17 +190,20 @@ function drawTable (ndx,selector) {
               return t + "</span>";
             },
             function (d) {
-                return d.first_name || "";
-            },
-            function (d) {
-                return "<a href='/civicrm/contact/view?cid="+d.id+"'>" + d.last_name+"</a>";
+                return "<a href='/civicrm/contact/view?cid="+d.id+"'>" + d.first_name + " " +d.last_name+"</a>";
             },
             function (d) {
                 return d.party || "?";
             },
             function (d) {
                 return d.country || "?";
-            }
+            },
+            function (d) {
+                return d.email || "";
+            },
+            function (d) {
+                return d.source || "";
+            },
         ])
         .sortBy(function (d) {
             return d.activity_date_time;
@@ -386,7 +389,7 @@ table .btn:disabled {
 <div class="col-sm-4" >
 <div class="input-group input-group-lg">
 <span class="hidden input-group-addon">🔎</span>
-            <input type="text" id="input-filter" class="form-control" placeholder="name, party, committee...">
+            <input type="text" id="input-filter" class="form-control" placeholder="name, party, country...">
 </div>
 </div>
 <div class="col-sm-4">
@@ -398,10 +401,11 @@ table .btn:disabled {
         <thead>
         <tr class="header">
             <th>Pledged?</th>
-            <th>First Name</th>
-            <th>Last Name</th>
+            <th>Name</th>
             <th>Party</th>
             <th>Country</th>
+            <th>email</th>
+            <th title="When we encounter the contact first">source</th>
         </tr>
         </thead>
     </table>
