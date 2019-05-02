@@ -80,6 +80,7 @@ function draw () {
   graphs.table= drawTable (ndx,  " .list");
      graphs.search = drawTextSearch('#input-filter', jQuery);
   graphs.status = drawStatus(".statuspledge");
+  drawNumber();
  
 //  drawParty (ndx,  selector + " .partyheat");
 //  drawBinary (ndx, selector + " .email","email");
@@ -117,6 +118,13 @@ function draw () {
 
     }
 
+
+function drawNumber(){
+  var group=ndx.groupAll().reduceCount();
+  dc.numberDisplay("#total")
+    .valueAccessor(function(d){return +d.value})
+    .group(group);   
+}
 
 function drawStatus (dom){
   var dim=ndx.dimension(function(d){return d.status_id});
