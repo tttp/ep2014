@@ -33,6 +33,22 @@
     <is_public>true</is_public>
   </item>
   <item>
+    <path>civicrm/public/candidate</path>
+    <page_callback>CRM_Public_Page_Candidate::Json</page_callback>
+    <title>Candidates that haven't</title>
+    <access_arguments>access AJAX API</access_arguments>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+  </item>
+  <item>
+    <path>civicrm/public/email</path>
+    <page_callback>CRM_Public_Page_Candidate::Email</page_callback>
+    <title>Email of the candidate</title>
+    <access_arguments>access AJAX API</access_arguments>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+  </item>
+  <item>
     <path>civicrm/candidate/view</path>
     <page_callback>CRM_Editor_Page_ROCandidate</page_callback>
     <title>View Candidates</title>

@@ -390,6 +390,7 @@ table .btn:disabled {
 <div class="input-group input-group-lg">
 <span class="hidden input-group-addon">🔎</span>
             <input type="text" id="input-filter" class="form-control" placeholder="name, party, country...">
+<div>The last column show where the candidate was first "met". if it's not on your campaign, you might want to consider it "vetted" by your partners.</div>
 </div>
 </div>
 <div class="col-sm-4">
@@ -405,7 +406,7 @@ table .btn:disabled {
             <th>Party</th>
             <th>Country</th>
             <th>email</th>
-            <th title="When we encounter the contact first">source</th>
+            <th title="When we encounter the contact first">Came from</th>
         </tr>
         </thead>
     </table>

@@ -121,13 +121,13 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     "aaData": candidates,
     aoColumnDefs: [
       {"aTargets":[0],sTitle:"",mData:"id",mRender:function (data,type,full) {return "<a class='ui-icon ui-icon-person' href='"+CRM.url('civicrm/contact/view', {"reset": 1, "cid":data})+"'></a><a class='ui-icon ui-icon-search' title='search on google'></a>";}},
-        { "aTargets":[0],"sTitle": "#", mDataProp: "position",sClass:""},
         { "aTargets":[1],"sTitle": "First Name", mDataProp: "first_name",sClass: "editable"},
         { "aTargets":[2],"sTitle": "Last Name", mDataProp: "last_name",sClass: "editable"},
         { "aTargets":[3],"sTitle": "country", mDataProp:"country", "sClass": "country" },
         { "aTargets":[4],"sTitle": "party", mDataProp:"party", "sClass": "party" },
         { "aTargets":[5],"sTitle": "email" , mDataProp:"email","sClass": "editable"},
         { "aTargets":[6],"sTitle": "twitter" , mDataProp:"twitter","sClass": "editable"},
+        { "aTargets":[7],"sTitle": "#", mDataProp: "position",sClass:""},
     ],
     "fnDrawCallback": function () {
        $(".ui-widget-header .btn").hide();
@@ -281,7 +281,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     $("#new_dialog")//.dialog({"modal":true, autoOpen:false}).
         .submit (function (e) {
       e.preventDefault();
-      var fields = ["first_name", "last_name", "twitter","email",party_field,country_field];
+      var fields = ["first_name", "last_name", "twitter","email",party_field,country_field,position];
       var params = {
         "dedupe_check":true,
         "option":{"match":["first_name","last_name","email"]},
@@ -363,6 +363,9 @@ td {word-break:break-word}
 </select>
 </div>
 <div class="form-group">
+<label>Position</label>
+<input id="position"  class="form-control " placeholder=""/>
+</div>
 <div class="form-group">
 <label>Twitter</label>
 <input id="twitter"  class="form-control " placeholder="@something"/>
