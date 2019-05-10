@@ -1,6 +1,9 @@
 <?php 
 
 function civicrm_api3_candidate_fix ($params) {
+	//	update civicrm_value_mep_2 set twitter_8 = replace(twitter_8,"https://twitter.com/","") where twitter_8 like "http%"
+	//	update civicrm_value_mep_2 set twitter_8 = replace(twitter_8,"@","") where twitter_8 like "@%"
+  return;
   $urlfixes = array (
    "wwwfacebook.com" => "www.facebook.com",
    "/ttp://" => "",

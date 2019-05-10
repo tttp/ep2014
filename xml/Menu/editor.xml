@@ -41,6 +41,13 @@
     <is_public>true</is_public>
   </item>
   <item>
+    <path>civicrm/public/validate</path>
+    <page_callback>CRM_Public_Page_Candidate::ValidateMail</page_callback>
+    <title>link to validate the candidate email</title>
+    <access_arguments>access AJAX API</access_arguments>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+  </item>
     <path>civicrm/public/email</path>
     <page_callback>CRM_Public_Page_Candidate::Email</page_callback>
     <title>Email of the candidate</title>

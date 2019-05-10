@@ -281,7 +281,7 @@ $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
     $("#new_dialog")//.dialog({"modal":true, autoOpen:false}).
         .submit (function (e) {
       e.preventDefault();
-      var fields = ["first_name", "last_name", "twitter","email",party_field,country_field,position];
+      var fields = ["first_name", "last_name", "twitter","email",party_field,country_field,"position"];
       var params = {
         "dedupe_check":true,
         "option":{"match":["first_name","last_name","email"]},
