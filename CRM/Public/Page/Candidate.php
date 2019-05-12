@@ -25,7 +25,7 @@ function Json(){
   header("Access-Control-Allow-Origin: *");
   $path = explode("/",parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
   $country = trim(preg_replace('#^[^a-zA-Z0-9\-_]$#', '', array_pop($path)));
-  if ($country =="candidate"){
+  if ($country =="candidate" || $country == ""){
     $country = civicrm_api3('Country', 'get', ['sequential' => 1,'iso_code' => ip2country_get_country(ip_address())])["id"];
   }
     $result = civicrm_api3('Candidate', 'get', [

@@ -1,4 +1,7 @@
 {crmTitle string="Campaign"}
+<style>
+.dc-chart {float:none;}
+</style>
 <script>
 {assign var="epgroup_field" value="custom_1"}
 {assign var="country_field" value="custom_4"}
@@ -58,7 +61,10 @@ cj(function($) {
     $.each(parties, function(n) {
     });
 
+    var dateFormat = d3.timeParse("%Y-%m-%d");
+
     candidates.forEach(function(d){
+       d.date=dateFormat(d.date);
        d.country="?";
        if (d.country_id && countries[d.country_id])
          d.country=countries[d.country_id].name;
@@ -76,10 +82,10 @@ function draw () {
   var ndx = crossfilter(candidates),
   all = ndx.groupAll();
 
-//  drawDate (ndx, " .date");
   graphs.table= drawTable (ndx,  " .list");
      graphs.search = drawTextSearch('#input-filter', jQuery);
   graphs.status = drawStatus(".statuspledge");
+  graphs.date=drawDate("#date");
   drawNumber();
  
 //  drawParty (ndx,  selector + " .partyheat");
@@ -119,10 +125,45 @@ function draw () {
     }
 
 
+function drawDate (selector) {
+  var chart = dc.lineChart(selector);
+
+  var dim = ndx.dimension(function(d) {
+      return d.date;
+      });
+
+  var _group = dim.group().reduceSum(function(d) {return 1;});
+
+  var group = {
+    all:function () {
+      var total = 0, g= [];
+      _group.all().forEach(function(d,i) {total += d.value; g.push({key:d.key,value:total})});
+      return g;
+    }
+  };
+  chart
+    .width(0)
+    .height(140)
+    .margins({top: 10, right: 0, bottom: 20, left: 40})
+    .x(d3.scaleTime().domain([new Date("2019-02-14"),new Date("2019-05-22")]))
+    .brushOn(true)
+    .renderArea(true)
+    .elasticY(true)
+    .yAxisLabel("nb Candidates")
+    .dimension(dim)
+    .group(group)
+
+   chart.xAxis().ticks(6);
+   chart.yAxis().ticks(4);
+
+  return chart;
+}
+
 function drawNumber(){
   var group=ndx.groupAll().reduceCount();
-  dc.numberDisplay("#total")
-    .valueAccessor(function(d){return +d.value})
+  graphs.total=dc.numberDisplay("#total")
+    .valueAccessor(function(d){return d;})
+    .formatNumber(d3.format(",d"))
     .group(group);   
 }
 
@@ -193,6 +234,9 @@ function drawTable (ndx,selector) {
                 return "<a href='/civicrm/contact/view?cid="+d.id+"'>" + d.first_name + " " +d.last_name+"</a>";
             },
             function (d) {
+                return d.position || "?";
+            },
+            function (d) {
                 return d.party || "?";
             },
             function (d) {
@@ -206,7 +250,8 @@ function drawTable (ndx,selector) {
             },
         ])
         .sortBy(function (d) {
-            return d.activity_date_time;
+            //return d.activity_date_time;
+            return d.date;
         })
         .order(d3.descending)
         .on('renderlet', function(chart) {
@@ -347,6 +392,7 @@ function download_excel() {
           d.first_name
           ,d.last_name
           ,d.country
+          ,d.position || "&nbsp;"
           ,d.party
           ,d.twitter ? d.twitter: ""
           ,d.mail ? d.mail:""
@@ -386,16 +432,19 @@ table .btn:disabled {
 <div class="statuspledge">
 </div>
 </div>
-<div class="col-sm-4" >
+<div class="col-sm-5" >
 <div class="input-group input-group-lg">
 <span class="hidden input-group-addon">🔎</span>
-            <input type="text" id="input-filter" class="form-control" placeholder="name, party, country...">
-<div>The last column show where the candidate was first "met". if it's not on your campaign, you might want to consider it "vetted" by your partners.</div>
+            <input type="text" id="input-filter" class="form-control" placeholder="Search by name, party, country...">
+<div id="date"></div>
 </div>
 </div>
-<div class="col-sm-4">
+<div class="col-sm-3">
+<h3><span id="total"></span> Signatories</h3>
+Download
 <i class='crm-i fa-download' id="csv"></i>
 <i class='crm-i fa-file-excel-o' id="excel"></i>
+<div class="small text-muted">The last column show where the candidate was first "met". if it's not on your campaign, you might want to consider it "vetted" by your partners.</div>
 </div>
 </div> 
     <table class="table table-hover list">
@@ -403,6 +452,7 @@ table .btn:disabled {
         <tr class="header">
             <th>Pledged?</th>
             <th>Name</th>
+            <th title="position in the list">#</th>
             <th>Party</th>
             <th>Country</th>
             <th>email</th>

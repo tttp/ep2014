@@ -1,6 +1,7 @@
 {"query":"SELECT 
 contact_a.id, first_name, last_name,
 civicrm_value_mep_2.id as civicrm_value_mep_2_id, 
+position_6 as position,
 party_5 as party_id,
 twitter_8 as twitter,
 civicrm_value_mep_2.country_4 as country_id,
